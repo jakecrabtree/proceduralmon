@@ -4,13 +4,11 @@ using UnityEngine;
 
 public class MonsterTree {
 	MonsterTreeNode root;
-
 	public MonsterTree breed(MonsterTree tree){
 		return this;
 	}
-}
-
-public class MonsterTreeNode {
-	MonsterTreeNode[] children = new MonsterTreeNode[20];
-	GameObject obj;
+	private class MonsterTreeNode {
+		public MonsterTreeNode[] children = new MonsterTreeNode[20];
+		public GameObject obj;
+	}
 }
