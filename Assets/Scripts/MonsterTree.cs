@@ -3,11 +3,12 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MonsterTree {
-	MonsterTreeNode root;
+	public MonsterTreeNode root;
 	public MonsterTree breed(MonsterTree tree){
 		return this;
 	}
 	public GameObject generateMonster() {
+		/*
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
 		Rigidbody rb = o.AddComponent<Rigidbody>();
 		GameObject o2 = GameObject.CreatePrimitive (PrimitiveType.Cube);
@@ -15,22 +16,72 @@ public class MonsterTree {
 		o2.transform.Translate (new Vector3 (1, 0, 0));
 		HingeJoint hj = o2.AddComponent<HingeJoint> ();
 		hj.connectedBody = rb;
-		return o;
+		return o;*/
+		return root.generateMonster (new Vector3(0, 4, 0));
 	}
 }
 public abstract class MonsterTreeNode {
-	protected MonsterTreeNode[] children;
-	protected GameObject obj;
-	protected int parent;
+	public MonsterTreeNode[] children;
+	public GameObject obj;
+	public int parent;
 	public abstract Vector3 getPositionOfChild(int child);
+	public GameObject generateMonster(Vector3 basePos) {
+		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
+		if (parent != -1) {
+			basePos -= getPositionOfChild (parent);
+		}
+		o.transform.position = basePos;
+		for (int i = 0; i < children.Length; i++) {
+			if (children [i] != null && i != parent) {
+				children[i].generateMonster (o.transform.position + getPositionOfChild(i));
+			}
+		}
+		return o;
+	}
 }
 
 public class CubeTreeNode : MonsterTreeNode { 
-	CubeTreeNode(int parent = -1){
+	public CubeTreeNode(int p = -1){
+		parent = p;
 		children = new MonsterTreeNode[20];
 		//TODO: obj = makecube
 	}
 	public override Vector3 getPositionOfChild(int child){
+		float L = -0.5f;
+		float H = 0.5f;
+		if (child < 8) {
+			float x = ((child & 1) == 0) ? L : H;
+			float y = (((child >> 1) & 1) == 0) ? L : H;
+			float z = (((child >> 2) & 1) == 0) ? L : H;
+			return new Vector3 (x, y, z);
+		} else {
+			switch (child) {
+			case 8:
+				return (getPositionOfChild (0) + getPositionOfChild (1)) / 2;
+			case 9:
+				return (getPositionOfChild (0) + getPositionOfChild (2)) / 2;
+			case 10:
+				return (getPositionOfChild (0) + getPositionOfChild (4)) / 2;
+			case 11:
+				return (getPositionOfChild (1) + getPositionOfChild (3)) / 2;
+			case 12:
+				return (getPositionOfChild (1) + getPositionOfChild (5)) / 2;
+			case 13:
+				return (getPositionOfChild (2) + getPositionOfChild (3)) / 2;
+			case 14:
+				return (getPositionOfChild (2) + getPositionOfChild (6)) / 2;
+			case 15:
+				return (getPositionOfChild (3) + getPositionOfChild (7)) / 2;
+			case 16:
+				return (getPositionOfChild (4) + getPositionOfChild (5)) / 2;
+			case 17:
+				return (getPositionOfChild (4) + getPositionOfChild (6)) / 2;
+			case 18:
+				return (getPositionOfChild (5) + getPositionOfChild (7)) / 2;
+			case 19:
+				return (getPositionOfChild (6) + getPositionOfChild (7)) / 2;
+			}
+		}
 		return new Vector3();
 	}
 }
