@@ -17,7 +17,7 @@ public class MonsterTree {
 		HingeJoint hj = o2.AddComponent<HingeJoint> ();
 		hj.connectedBody = rb;
 		return o;*/
-		return root.generateMonster (new Vector3(0, 4, 0));
+		return root.generateMonster (new Vector3(0, 40, 0), 0, null);
 	}
 }
 public abstract class MonsterTreeNode {
@@ -25,15 +25,32 @@ public abstract class MonsterTreeNode {
 	public GameObject obj;
 	public int parent;
 	public abstract Vector3 getPositionOfChild(int child);
-	public GameObject generateMonster(Vector3 basePos) {
+	public Vector3 getScaledPositionOfChild(int child) {
+		return Vector3.Scale(obj.transform.localScale, getPositionOfChild(child));
+	}
+	public GameObject generateMonster(Vector3 basePos, int depth, GameObject par) {
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
+		obj = o;
+		o.transform.localScale = new Vector3 (Random.Range(10, 100) / 20.0f, Random.Range(10, 100) / 20.0f, Random.Range(10,100) / 20.0f);
+		//o.transform.localScale = new Vector3(1, 1, 1);
+		//o.transform.localScale = new Vector3(1, 1, 1);
+		o.AddComponent<Rigidbody> ();
 		if (parent != -1) {
-			basePos -= getPositionOfChild (parent);
+			basePos -= getScaledPositionOfChild (parent);
 		}
+		Debug.Log ("POS: " + basePos);
 		o.transform.position = basePos;
+		if (par != null) {
+			//o.transform.SetParent (par.transform);
+			HingeJoint cj = o.AddComponent<HingeJoint> ();
+			cj.connectedBody = par.transform.GetComponent<Rigidbody> ();
+			cj.anchor = getPositionOfChild (parent);
+		}
 		for (int i = 0; i < children.Length; i++) {
-			if (children [i] != null && i != parent) {
-				children[i].generateMonster (o.transform.position + getPositionOfChild(i));
+			if (/*children [i] != null && i != parent*/ Random.Range(0, 100) < (100 / (depth + 5)) && depth < 3 && i != parent) {
+				children[i] = new CubeTreeNode (Random.Range(0, 20));
+				children[i].children [children[i].parent] = this;
+				children[i].generateMonster (o.transform.position + getScaledPositionOfChild(i), depth + 1, o);
 			}
 		}
 		return o;
