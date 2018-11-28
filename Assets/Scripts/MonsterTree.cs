@@ -12,10 +12,9 @@ public class MonsterTree {
 	}
 
 	private MonsterTree clone(){
-		MonsterTree newTree = new MonsterTree(); 
-		//foreach(MonsterTreeNode node in nodes){
-		//	newTree.nodes.Add(node.clone());
-		//}
+		MonsterTree newTree = new MonsterTree();
+		newTree.nodes = root.CopySubTree();
+		newTree.root = newTree.nodes[0];
 		return newTree;
 	}
 
@@ -28,10 +27,10 @@ public class MonsterTree {
 	private MonsterTree asexual(MonsterTree tree){
 		float type = Random.Range(0.0f, 1.0f);
 		if(type <= 0.5f){
-			return this;
+			return this.clone();
 		}
 		else{
-			return tree;
+			return tree.clone();
 		}
 	}
 	public MonsterTree breed(MonsterTree tree){
@@ -67,9 +66,35 @@ public abstract class MonsterTreeNode {
 	public GameObject obj;
 	public int parent;
 	public abstract Vector3 getPositionOfChild(int child);
-	public MonsterTreeNode clone(){
-		//TODO:Actually clone it 
-		return this;
+	protected abstract MonsterTreeNode createEmptyClone();
+
+	public MonsterTreeNode LocalClone(){
+		MonsterTreeNode cloneNode = createEmptyClone();
+		cloneNode.parent = parent;
+		cloneNode.obj = GameObject.Instantiate(obj);
+		cloneNode.children = new MonsterTreeNode[children.Length];
+		return cloneNode;
+	}
+
+	private MonsterTreeNode CopySubTreeHelper(List<MonsterTreeNode> nodes, MonsterTreeNode parentNode){
+		MonsterTreeNode copyNode = this.LocalClone();
+		nodes.Add(copyNode);
+		for (int i = 0; i < children.Length; ++i){
+			if (children[i] == null) continue;
+			if (i == parent){ 
+				copyNode.children[i] = parentNode;
+			}
+			else{
+				copyNode.children[i] = children[i].CopySubTreeHelper(nodes, this);
+			}
+		}
+		return copyNode;
+	}
+	public List<MonsterTreeNode> CopySubTree(){
+		List<MonsterTreeNode> ret = new List<MonsterTreeNode>();
+		ret.Add(null);
+		ret[0] = this.CopySubTreeHelper(ret, null);
+		return ret;
 	}
 	public GameObject generateMonster(Vector3 basePos) {
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
@@ -91,6 +116,10 @@ public class CubeTreeNode : MonsterTreeNode {
 		parent = p;
 		children = new MonsterTreeNode[20];
 		//TODO: obj = makecube
+	}
+
+	protected override MonsterTreeNode createEmptyClone(){
+		return new CubeTreeNode();
 	}
 	public override Vector3 getPositionOfChild(int child){
 		float L = -0.5f;
