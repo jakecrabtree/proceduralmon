@@ -3,9 +3,51 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MonsterTree {
+	//TODO: Make private
 	public MonsterTreeNode root;
-	public MonsterTree breed(MonsterTree tree){
+	List<MonsterTreeNode> nodes;
+
+	public MonsterTree(){
+		nodes = new List<MonsterTreeNode>();
+	}
+
+	private MonsterTree clone(){
+		MonsterTree newTree = new MonsterTree(); 
+		//foreach(MonsterTreeNode node in nodes){
+		//	newTree.nodes.Add(node.clone());
+		//}
+		return newTree;
+	}
+
+	private MonsterTree graft(MonsterTree tree){
 		return this;
+	}
+	private MonsterTree crossover(MonsterTree tree){
+		return this;
+	}
+	private MonsterTree asexual(MonsterTree tree){
+		float type = Random.Range(0.0f, 1.0f);
+		if(type <= 0.5f){
+			return this;
+		}
+		else{
+			return tree;
+		}
+	}
+	public MonsterTree breed(MonsterTree tree){
+		float type = Random.Range(0.0f,1.0f);
+		if(type <= 0.3f){
+			//Crossover
+			return crossover(tree);
+		}
+		else if (type <= 0.6f){
+			//Grafting
+			return graft(tree);
+		}
+		else{
+			//Asexual
+			return asexual(tree);
+		}
 	}
 	public GameObject generateMonster() {
 		/*
@@ -27,6 +69,10 @@ public abstract class MonsterTreeNode {
 	public abstract Vector3 getPositionOfChild(int child);
 	public Vector3 getScaledPositionOfChild(int child) {
 		return Vector3.Scale(obj.transform.localScale, getPositionOfChild(child));
+	}
+	public MonsterTreeNode clone(){
+		//TODO:Actually clone it 
+		return this;
 	}
 	public GameObject generateMonster(Vector3 basePos, int depth, GameObject par) {
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
