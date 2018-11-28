@@ -4,8 +4,49 @@ using UnityEngine;
 
 public class MonsterTree {
 	MonsterTreeNode root;
-	public MonsterTree breed(MonsterTree tree){
+	List<MonsterTreeNode> nodes;
+
+	public MonsterTree(){
+		nodes = new List<MonsterTreeNode>();
+	}
+
+	private MonsterTree clone(){
+		MonsterTree newTree = new MonsterTree(); 
+		//foreach(MonsterTreeNode node in nodes){
+		//	newTree.nodes.Add(node.clone());
+		//}
+		return newTree;
+	}
+
+	private MonsterTree graft(MonsterTree tree){
 		return this;
+	}
+	private MonsterTree crossover(MonsterTree tree){
+		return this;
+	}
+	private MonsterTree asexual(MonsterTree tree){
+		float type = Random.Range(0.0f, 1.0f);
+		if(type <= 0.5f){
+			return this;
+		}
+		else{
+			return tree;
+		}
+	}
+	public MonsterTree breed(MonsterTree tree){
+		float type = Random.Range(0.0f,1.0f);
+		if(type <= 0.3f){
+			//Crossover
+			return crossover(tree);
+		}
+		else if (type <= 0.6f){
+			//Grafting
+			return graft(tree);
+		}
+		else{
+			//Asexual
+			return asexual(tree);
+		}
 	}
 	public GameObject generateMonster() {
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
@@ -23,6 +64,10 @@ public abstract class MonsterTreeNode {
 	protected GameObject obj;
 	protected int parent;
 	public abstract Vector3 getPositionOfChild(int child);
+	public MonsterTreeNode clone(){
+		//TODO:Actually clone it 
+		return this;
+	}
 }
 
 public class CubeTreeNode : MonsterTreeNode { 
