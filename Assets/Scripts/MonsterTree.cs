@@ -19,13 +19,31 @@ public class MonsterTree {
 	}
 
 	private MonsterTree graft(MonsterTree tree){
-		return this;
+		//Select Node from caller's tree
+		int index = Random.Range(0, nodes.Count);
+		MonsterTreeNode selectedNode = nodes[index];
+		int insertionPos = selectedNode.parent;
+		while (insertionPos != selectedNode.parent){
+			insertionPos = Random.Range(0, selectedNode.children.Length);
+		} 
+		
+		//Select Node from param's tree
+		int targetIndex = Random.Range(0, tree.nodes.Count);
+		MonsterTreeNode targetNode = nodes[targetIndex];
+
+		//Copy Caller's Tree and target's subtree
+		MonsterTree res = this.clone();
+		List<MonsterTreeNode> newNodes = targetNode.CopySubTree();
+		res.nodes[index].children[insertionPos] = newNodes[0];
+		res.nodes.AddRange(newNodes);
+		return res;
 	}
 	private MonsterTree crossover(MonsterTree tree){
-		return this;
+		
+		return graft(tree);
 	}
 	private MonsterTree asexual(MonsterTree tree){
-		float type = Random.Range(0.0f, 1.0f);
+		float type = UnityEngine.Random.Range(0.0f, 1.0f);
 		if(type <= 0.5f){
 			return this.clone();
 		}
@@ -34,7 +52,7 @@ public class MonsterTree {
 		}
 	}
 	public MonsterTree breed(MonsterTree tree){
-		float type = Random.Range(0.0f,1.0f);
+		float type = UnityEngine.Random.Range(0.0f,1.0f);
 		if(type <= 0.3f){
 			//Crossover
 			return crossover(tree);
@@ -58,7 +76,7 @@ public class MonsterTree {
 		HingeJoint hj = o2.AddComponent<HingeJoint> ();
 		hj.connectedBody = rb;
 		return o;*/
-		return root.generateMonster (new Vector3(0, 4, 0));
+		return root.generateMonster (new Vector3(0, 40, 0), 0, null);
 	}
 }
 public abstract class MonsterTreeNode {
@@ -96,15 +114,32 @@ public abstract class MonsterTreeNode {
 		ret[0] = this.CopySubTreeHelper(ret, null);
 		return ret;
 	}
-	public GameObject generateMonster(Vector3 basePos) {
+	public Vector3 getScaledPositionOfChild(int child) {
+		return Vector3.Scale(obj.transform.localScale, getPositionOfChild(child));
+	}
+	public GameObject generateMonster(Vector3 basePos, int depth, GameObject par) {
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
+		obj = o;
+		o.transform.localScale = new Vector3 (Random.Range(10, 100) / 20.0f, Random.Range(10, 100) / 20.0f, Random.Range(10,100) / 20.0f);
+		//o.transform.localScale = new Vector3(1, 1, 1);
+		//o.transform.localScale = new Vector3(1, 1, 1);
+		o.AddComponent<Rigidbody> ();
 		if (parent != -1) {
-			basePos -= getPositionOfChild (parent);
+			basePos -= getScaledPositionOfChild (parent);
 		}
+		Debug.Log ("POS: " + basePos);
 		o.transform.position = basePos;
+		if (par != null) {
+			//o.transform.SetParent (par.transform);
+			HingeJoint cj = o.AddComponent<HingeJoint> ();
+			cj.connectedBody = par.transform.GetComponent<Rigidbody> ();
+			cj.anchor = getPositionOfChild (parent);
+		}
 		for (int i = 0; i < children.Length; i++) {
-			if (children [i] != null && i != parent) {
-				children[i].generateMonster (o.transform.position + getPositionOfChild(i));
+			if (/*children [i] != null && i != parent*/ Random.Range(0, 100) < (100 / (depth + 5)) && depth < 3 && i != parent) {
+				children[i] = new CubeTreeNode (Random.Range(0, 20));
+				children[i].children [children[i].parent] = this;
+				children[i].generateMonster (o.transform.position + getScaledPositionOfChild(i), depth + 1, o);
 			}
 		}
 		return o;
