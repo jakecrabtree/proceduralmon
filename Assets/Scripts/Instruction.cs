@@ -29,8 +29,8 @@ public class Instruction {
     
     public void setY(int num) {
         instruction[2] = num;
-    }
     
+}    
     public void setZ(int num) {
         instruction[3] = num;
     }
@@ -49,5 +49,9 @@ public class Instruction {
     
     public int getZ() {
         return instruction[3];
+    }
+
+    public int[] DeepCopy(){
+        return instruction.Copy();
     }
 }

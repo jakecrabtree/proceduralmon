@@ -18,4 +18,12 @@ public class InstructionSet {
         instructionSet.Remove(i);
         instructionSet.Insert(index, i);
     }
+
+    public void getInstruction(int index){
+        instructionSet.Get
+    }
+
+    public void getCount(){
+        return instructionSet.Count();
+    }
 }

@@ -12,30 +12,47 @@ public class MonsterTree {
 	}
 
 	private MonsterTree clone(){
-		MonsterTree newTree = new MonsterTree(); 
-		//foreach(MonsterTreeNode node in nodes){
-		//	newTree.nodes.Add(node.clone());
-		//}
+		MonsterTree newTree = new MonsterTree();
+		newTree.nodes = root.CopySubTree();
+		newTree.root = newTree.nodes[0];
 		return newTree;
 	}
 
 	private MonsterTree graft(MonsterTree tree){
-		return this;
+		//Select Node from caller's tree
+		int index = Random.Range(0, nodes.Count);
+		MonsterTreeNode selectedNode = nodes[index];
+		int insertionPos = selectedNode.parent;
+		while (insertionPos != selectedNode.parent){
+			insertionPos = Random.Range(0, selectedNode.children.Length);
+		} 
+		
+		//Select Node from param's tree
+		int targetIndex = Random.Range(0, tree.nodes.Count);
+		MonsterTreeNode targetNode = nodes[targetIndex];
+
+		//Copy Caller's Tree and target's subtree
+		MonsterTree res = this.clone();
+		List<MonsterTreeNode> newNodes = targetNode.CopySubTree();
+		res.nodes[index].children[insertionPos] = newNodes[0];
+		res.nodes.AddRange(newNodes);
+		return res;
 	}
 	private MonsterTree crossover(MonsterTree tree){
-		return this;
+		
+		return graft(tree);
 	}
 	private MonsterTree asexual(MonsterTree tree){
-		float type = Random.Range(0.0f, 1.0f);
+		float type = UnityEngine.Random.Range(0.0f, 1.0f);
 		if(type <= 0.5f){
-			return this;
+			return this.clone();
 		}
 		else{
-			return tree;
+			return tree.clone();
 		}
 	}
 	public MonsterTree breed(MonsterTree tree){
-		float type = Random.Range(0.0f,1.0f);
+		float type = UnityEngine.Random.Range(0.0f,1.0f);
 		if(type <= 0.3f){
 			//Crossover
 			return crossover(tree);
@@ -67,12 +84,38 @@ public abstract class MonsterTreeNode {
 	public GameObject obj;
 	public int parent;
 	public abstract Vector3 getPositionOfChild(int child);
+	protected abstract MonsterTreeNode createEmptyClone();
+
+	public MonsterTreeNode LocalClone(){
+		MonsterTreeNode cloneNode = createEmptyClone();
+		cloneNode.parent = parent;
+		cloneNode.obj = GameObject.Instantiate(obj);
+		cloneNode.children = new MonsterTreeNode[children.Length];
+		return cloneNode;
+	}
+
+	private MonsterTreeNode CopySubTreeHelper(List<MonsterTreeNode> nodes, MonsterTreeNode parentNode){
+		MonsterTreeNode copyNode = this.LocalClone();
+		nodes.Add(copyNode);
+		for (int i = 0; i < children.Length; ++i){
+			if (children[i] == null) continue;
+			if (i == parent){ 
+				copyNode.children[i] = parentNode;
+			}
+			else{
+				copyNode.children[i] = children[i].CopySubTreeHelper(nodes, this);
+			}
+		}
+		return copyNode;
+	}
+	public List<MonsterTreeNode> CopySubTree(){
+		List<MonsterTreeNode> ret = new List<MonsterTreeNode>();
+		ret.Add(null);
+		ret[0] = this.CopySubTreeHelper(ret, null);
+		return ret;
+	}
 	public Vector3 getScaledPositionOfChild(int child) {
 		return Vector3.Scale(obj.transform.localScale, getPositionOfChild(child));
-	}
-	public MonsterTreeNode clone(){
-		//TODO:Actually clone it 
-		return this;
 	}
 	public GameObject generateMonster(Vector3 basePos, int depth, GameObject par) {
 		//TODO return null if bad creature
@@ -111,6 +154,10 @@ public class CubeTreeNode : MonsterTreeNode {
 		parent = p;
 		children = new MonsterTreeNode[20];
 		//TODO: obj = makecube
+	}
+
+	protected override MonsterTreeNode createEmptyClone(){
+		return new CubeTreeNode();
 	}
 	public override Vector3 getPositionOfChild(int child){
 		float L = -0.5f;
