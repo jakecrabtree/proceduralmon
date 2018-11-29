@@ -75,8 +75,11 @@ public abstract class MonsterTreeNode {
 		return this;
 	}
 	public GameObject generateMonster(Vector3 basePos, int depth, GameObject par) {
+		//TODO return null if bad creature
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
 		obj = o;
+		/*Material myMat = Material
+		myMat.color = new Color(Random.Range(0, 256) / 256.0f, Random.Range(0, 256) / 256.0f, Random.Range(0, 256) / 256.0f);*/
 		o.transform.localScale = new Vector3 (Random.Range(10, 100) / 20.0f, Random.Range(10, 100) / 20.0f, Random.Range(10,100) / 20.0f);
 		//o.transform.localScale = new Vector3(1, 1, 1);
 		//o.transform.localScale = new Vector3(1, 1, 1);
