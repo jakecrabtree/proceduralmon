@@ -18,4 +18,12 @@ public class MonsterSpawner : MonoBehaviour {
 	void Update () {
 		
 	}
+
+	void FixedUpdate() {
+		if (Input.GetKeyDown (KeyCode.Space)) {
+			MonsterTree t = new MonsterTree ();
+			t.RandomizeUntilSane (3);
+			t.generateMonster ();
+		}
+	}
 }
