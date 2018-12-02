@@ -19,7 +19,7 @@ public class MonsterTree {
 	}
 
 	private MonsterTree graft(MonsterTree tree){
-		//Select Node from caller's tree
+		//Select Node and where to insert in this node from caller's tree
 		int index = Random.Range(0, nodes.Count);
 		MonsterTreeNode selectedNode = nodes[index];
 		int insertionPos = selectedNode.parent;
@@ -39,31 +39,45 @@ public class MonsterTree {
 		return res;
 	}
 	private MonsterTree crossover(MonsterTree tree){
+		MonsterTree res = this.clone();
+		//Get positions of all the caller's nodes
+		Dictionary<MonsterTreeNode, int> callerMap = new Dictionary<MonsterTreeNode, int>();
+		for (int i = 0; i < res.nodes.Count; ++i){
+			callerMap.Add(res.nodes[i], i);
+		}
+		//Get positions of all the param's nodes
+		Dictionary<MonsterTreeNode, int> paramMap = new Dictionary<MonsterTreeNode, int>();
+		for (int i = 0; i < tree.nodes.Count; ++i){
+			paramMap.Add(tree.nodes[i], i);
+		}
+
+		//Find Crossover Point
+		int crossoverPoint = Random.Range(0, nodes.Count);
 		
-		return graft(tree);
+		/* 	for (int i = crossoverPoint; i < tree.nodes.Count; ++i){
+			MonsterTreeNode currNode = res.nodes[i];
+			for(int c = 0; c < currNode.children.Length; ++c){
+				MonsterTreeNode child = currNode.children[c];
+				if (child == null || c == currNode.parent) continue;
+				int childPos = [child];
+			}
+		}*/
+
+		
+		return res;
 	}
-	private MonsterTree asexual(MonsterTree tree){
-		float type = UnityEngine.Random.Range(0.0f, 1.0f);
-		if(type <= 0.5f){
-			return this.clone();
-		}
-		else{
-			return tree.clone();
-		}
+	public MonsterTree asexual(){
+		return this.clone();
 	}
 	public MonsterTree breed(MonsterTree tree){
 		float type = UnityEngine.Random.Range(0.0f,1.0f);
-		if(type <= 0.3f){
+		if(type <= 0.5f){
 			//Crossover
 			return crossover(tree);
 		}
-		else if (type <= 0.6f){
+		else{
 			//Grafting
 			return graft(tree);
-		}
-		else{
-			//Asexual
-			return asexual(tree);
 		}
 	}
 	public GameObject generateMonster() {
@@ -86,6 +100,7 @@ public abstract class MonsterTreeNode {
 	public abstract Vector3 getPositionOfChild(int child);
 	protected abstract MonsterTreeNode createEmptyClone();
 
+	//Does NOT clone children, only local data to the node
 	public MonsterTreeNode LocalClone(){
 		MonsterTreeNode cloneNode = createEmptyClone();
 		cloneNode.parent = parent;
@@ -108,10 +123,10 @@ public abstract class MonsterTreeNode {
 		}
 		return copyNode;
 	}
+	//returned list is in pre-order traversal order!
 	public List<MonsterTreeNode> CopySubTree(){
 		List<MonsterTreeNode> ret = new List<MonsterTreeNode>();
-		ret.Add(null);
-		ret[0] = this.CopySubTreeHelper(ret, null);
+		this.CopySubTreeHelper(ret, null);
 		return ret;
 	}
 	public Vector3 getScaledPositionOfChild(int child) {

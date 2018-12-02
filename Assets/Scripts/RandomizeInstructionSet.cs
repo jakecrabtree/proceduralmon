@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class RandomizeInstructionSet{
-
 	public InstructionSet RandomizeInstructionSet(InstructionSet iSet){
 		return iSet;
 	}
