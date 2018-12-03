@@ -16,14 +16,14 @@ public class MonsterSpawner : MonoBehaviour {
 	
 	// Update is called once per frame
 	void Update () {
-		
-	}
-
-	void FixedUpdate() {
 		if (Input.GetKeyDown (KeyCode.Space)) {
 			MonsterTree t = new MonsterTree ();
 			t.RandomizeUntilSane (3);
 			t.generateMonster ();
 		}
+	}
+
+	void FixedUpdate() {
+		
 	}
 }

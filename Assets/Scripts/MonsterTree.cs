@@ -13,14 +13,17 @@ public class MonsterTree {
 
 	private void Randomize(int maxDepth){
 		root = new CubeTreeNode (-1);
-		root.Randomize(maxDepth);
+		root.Randomize(maxDepth, maxDepth);
 		nodes = root.CopySubTree ();
 	}
 
 	public void RandomizeUntilSane(int maxDepth){
+		Debug.Log ("HI!");
+		int count = 0;
 		do {
+			Debug.Log("LOOPING: " + count);
 			Randomize (maxDepth);
-		} while(selfIntersects () || nodes.Count > 5);
+		} while((nodes.Count > 10 || nodes.Count <= 2 || selfIntersects ()) && (count++) < 100);
 	}
 
 	public bool selfIntersects(){
@@ -135,6 +138,13 @@ public abstract class MonsterTreeNode {
 		return ret;
 	}
 	public bool checkForSelfIntersect(HashSet<long> ha, float basex, float basey, float basez) {
+		Debug.Log ("SI CHECK");
+		if (parent != -1) {
+			Vector3 ppos = getScaledPositionOfChild (parent);
+			basex -= ppos.x;
+			basey -= ppos.y;
+			basez -= ppos.z;
+		}
 		Vector3 llpos = getScaledPositionOfChild (0);
 		long x = Mathf.RoundToInt ((basex + llpos.x) * 10) + 500000;
 		long y = Mathf.RoundToInt ((basey + llpos.y) * 10) + 500000;
@@ -144,12 +154,68 @@ public abstract class MonsterTreeNode {
 		int sz = Mathf.RoundToInt (scale.z * 10);
 		for (long x0 = x; x0 < x + sx; x0++) {
 			for (long y0 = y; y0 < y + sy; y0++) {
-				for (long z0 = z; z0 < z + sz; z0++) {
-					long myha = (z << 40) | (y << 20) | x;
+				long z0 = z;
+					long myha = (z0 << 40) | (y0 << 20) | x0;
+					//Debug.Log ("HASH: " + myha);
 					if (ha.Contains (myha)) {
 						return true;
 					}
+					ha.Add (myha);
+			}
+		}
+		for (long x0 = x; x0 < x + sx; x0++) {
+			for (long y0 = y; y0 < y + sy; y0++) {
+				long z0 = z + sz - 1;
+				long myha = (z0 << 40) | (y0 << 20) | x0;
+				//Debug.Log ("HASH: " + myha);
+				if (ha.Contains (myha)) {
+					return true;
 				}
+				ha.Add (myha);
+			}
+		}
+		for (long z0 = z + 1; z0 < z + sz - 1; z0++) {
+			for (long y0 = y; y0 < y + sy; y0++) {
+				long x0 = x;
+				long myha = (z0 << 40) | (y0 << 20) | x0;
+				//Debug.Log ("HASH: " + myha);
+				if (ha.Contains (myha)) {
+					return true;
+				}
+				ha.Add (myha);
+			}
+		}
+		for (long z0 = z + 1; z0 < z + sz - 1; z0++) {
+			for (long y0 = y; y0 < y + sy; y0++) {
+				long x0 = x + sx - 1;
+				long myha = (z0 << 40) | (y0 << 20) | x0;
+				//Debug.Log ("HASH: " + myha);
+				if (ha.Contains (myha)) {
+					return true;
+				}
+				ha.Add (myha);
+			}
+		}
+		for (long x0 = x + 1; x0 < x + sx - 1; x0++) {
+			for (long z0 = z + 1; z0 < z + sz - 1; z0++) {
+				long y0 = y;
+				long myha = (z0 << 40) | (y0 << 20) | x0;
+				//Debug.Log ("HASH: " + myha);
+				if (ha.Contains (myha)) {
+					return true;
+				}
+				ha.Add (myha);
+			}
+		}
+		for (long x0 = x + 1; x0 < x + sx - 1; x0++) {
+			for (long z0 = z + 1; z0 < z + sz - 1; z0++) {
+				long y0 = y + sy - 1;
+				long myha = (z0 << 40) | (y0 << 20) | x0;
+				//Debug.Log ("HASH: " + myha);
+				if (ha.Contains (myha)) {
+					return true;
+				}
+				ha.Add (myha);
 			}
 		}
 		for (int i = 0; i < children.Length; i++) {
@@ -165,11 +231,12 @@ public abstract class MonsterTreeNode {
 	public Vector3 getScaledPositionOfChild(int child) {
 		return Vector3.Scale(scale, getPositionOfChild(child));
 	}
-	public void Randomize (int maxDepth) {
-		for (int i = 0; i < children.Length; i++) {
-			if (Random.Range(0, 100) < (10 * maxDepth) && maxDepth > 0 && i != parent) {
+	public void Randomize (int maxDepth, int totalDepth) {
+		for (int i = 0; i < 20; i++) {
+			if (Random.Range(0, 100) < (12 / totalDepth * maxDepth) && maxDepth > 0 && i != parent) {
 				children[i] = new CubeTreeNode (Random.Range(0, children.Length));
 				children[i].children [children[i].parent] = this;
+				children [i].Randomize (maxDepth - 1, totalDepth);
 			}
 		}
 	}
@@ -194,6 +261,14 @@ public abstract class MonsterTreeNode {
 			cj.enableCollision = true;
 			cj.useMotor = true;
 			JointMotor jm = cj.motor;
+			int x = Random.Range (0, 3);
+			if (x == 0) {
+				cj.axis = new Vector3 (1, 0, 0);
+			} else if (x == 1) {
+				cj.axis = new Vector3 (0, 1, 0);
+			} else {
+				cj.axis = new Vector3 (0, 0, 1);
+			}
 			jm.targetVelocity = Random.Range(-1000, 1000);
 			jm.force = 250;
 			cj.motor = jm;
