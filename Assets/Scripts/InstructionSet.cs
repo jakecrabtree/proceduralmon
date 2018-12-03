@@ -20,10 +20,10 @@ public class InstructionSet {
     }
 
     public void getInstruction(int index){
-        instructionSet.Get
+      //  instructionSet.Get
     }
 
-    public void getCount(){
-        return instructionSet.Count();
+    public int getCount(){
+        return instructionSet.Count;
     }
 }

@@ -50,8 +50,8 @@ public class Instruction {
     public int getZ() {
         return instruction[3];
     }
-
+/* 
     public int[] DeepCopy(){
         return instruction.Copy();
-    }
+    }*/
 }

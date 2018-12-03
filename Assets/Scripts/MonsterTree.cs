@@ -33,18 +33,34 @@ public class MonsterTree {
 
 		//Copy Caller's Tree and target's subtree
 		MonsterTree res = this.clone();
+		Dictionary<MonsterTreeNode, int> callerMap = new Dictionary<MonsterTreeNode, int>();
+		for (int i = 0; i < res.nodes.Count; ++i){
+			callerMap.Add(res.nodes[i], i);
+		}
+		if(index+1 < res.nodes.Count){
+			res.nodes.RemoveRange(index+1, res.nodes.Count-index-1);
+		}
+		foreach(MonsterTreeNode currNode in res.nodes){
+			for(int c = 0; c < currNode.children.Length; ++c){
+				MonsterTreeNode child = currNode.children[c];
+				if (child == null || c == currNode.parent) continue;
+				if (callerMap[child] > index){
+					currNode.children[c] = null;
+				}
+			}
+		}
 		List<MonsterTreeNode> newNodes = targetNode.CopySubTree();
 		res.nodes[index].children[insertionPos] = newNodes[0];
 		res.nodes.AddRange(newNodes);
 		return res;
 	}
 	private MonsterTree crossover(MonsterTree tree){
-		MonsterTree res = this.clone();
+	//	MonsterTree res = this.clone();
 		//Get positions of all the caller's nodes
-		Dictionary<MonsterTreeNode, int> callerMap = new Dictionary<MonsterTreeNode, int>();
-		for (int i = 0; i < res.nodes.Count; ++i){
-			callerMap.Add(res.nodes[i], i);
-		}
+	//	Dictionary<MonsterTreeNode, int> callerMap = new Dictionary<MonsterTreeNode, int>();
+	//	for (int i = 0; i < res.nodes.Count; ++i){
+	//		callerMap.Add(res.nodes[i], i);
+	//	}
 		//Get positions of all the param's nodes
 		Dictionary<MonsterTreeNode, int> paramMap = new Dictionary<MonsterTreeNode, int>();
 		for (int i = 0; i < tree.nodes.Count; ++i){
@@ -64,7 +80,7 @@ public class MonsterTree {
 		}*/
 
 		
-		return res;
+		return graft(tree);
 	}
 	public MonsterTree asexual(){
 		return this.clone();
