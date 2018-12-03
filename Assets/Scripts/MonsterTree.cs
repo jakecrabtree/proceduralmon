@@ -11,6 +11,26 @@ public class MonsterTree {
 		nodes = new List<MonsterTreeNode>();
 	}
 
+	private void Randomize(int maxDepth){
+		root = new CubeTreeNode (-1);
+		root.Randomize(maxDepth, maxDepth);
+		nodes = root.CopySubTree ();
+	}
+
+	public void RandomizeUntilSane(int maxDepth){
+		Debug.Log ("HI!");
+		int count = 0;
+		do {
+			Debug.Log("LOOPING: " + count);
+			Randomize (maxDepth);
+		} while((nodes.Count > 10 || nodes.Count <= 2 || selfIntersects ()) && (count++) < 100);
+	}
+
+	public bool selfIntersects(){
+		HashSet<long> spahash = new HashSet<long>();
+		return root.checkForSelfIntersect (spahash, 0, 0, 0);
+	}
+
 	private MonsterTree clone(){
 		MonsterTree newTree = new MonsterTree();
 		newTree.nodes = root.CopySubTree();
@@ -113,6 +133,7 @@ public abstract class MonsterTreeNode {
 	public MonsterTreeNode[] children;
 	public GameObject obj;
 	public int parent;
+	public Vector3 scale;
 	public abstract Vector3 getPositionOfChild(int child);
 	protected abstract MonsterTreeNode createEmptyClone();
 
@@ -120,8 +141,10 @@ public abstract class MonsterTreeNode {
 	public MonsterTreeNode LocalClone(){
 		MonsterTreeNode cloneNode = createEmptyClone();
 		cloneNode.parent = parent;
-		cloneNode.obj = GameObject.Instantiate(obj);
+		//I think the GameObject shouldn't be cloned here, just the info about it (scale)
+		//cloneNode.obj = GameObject.Instantiate(obj);
 		cloneNode.children = new MonsterTreeNode[children.Length];
+		cloneNode.scale = scale;
 		return cloneNode;
 	}
 
@@ -145,13 +168,116 @@ public abstract class MonsterTreeNode {
 		this.CopySubTreeHelper(ret, null);
 		return ret;
 	}
-	public Vector3 getScaledPositionOfChild(int child) {
-		return Vector3.Scale(obj.transform.localScale, getPositionOfChild(child));
+	public bool checkForSelfIntersect(HashSet<long> ha, float basex, float basey, float basez) {
+		Debug.Log ("SI CHECK");
+		if (parent != -1) {
+			Vector3 ppos = getScaledPositionOfChild (parent);
+			basex -= ppos.x;
+			basey -= ppos.y;
+			basez -= ppos.z;
+		}
+		Vector3 llpos = getScaledPositionOfChild (0);
+		long x = Mathf.RoundToInt ((basex + llpos.x) * 10) + 500000;
+		long y = Mathf.RoundToInt ((basey + llpos.y) * 10) + 500000;
+		long z = Mathf.RoundToInt ((basez + llpos.z) * 10) + 500000; 
+		int sx = Mathf.RoundToInt (scale.x * 10);
+		int sy = Mathf.RoundToInt (scale.y * 10);
+		int sz = Mathf.RoundToInt (scale.z * 10);
+		for (long x0 = x; x0 < x + sx; x0++) {
+			for (long y0 = y; y0 < y + sy; y0++) {
+				long z0 = z;
+					long myha = (z0 << 40) | (y0 << 20) | x0;
+					//Debug.Log ("HASH: " + myha);
+					if (ha.Contains (myha)) {
+						return true;
+					}
+					ha.Add (myha);
+			}
+		}
+		for (long x0 = x; x0 < x + sx; x0++) {
+			for (long y0 = y; y0 < y + sy; y0++) {
+				long z0 = z + sz - 1;
+				long myha = (z0 << 40) | (y0 << 20) | x0;
+				//Debug.Log ("HASH: " + myha);
+				if (ha.Contains (myha)) {
+					return true;
+				}
+				ha.Add (myha);
+			}
+		}
+		for (long z0 = z + 1; z0 < z + sz - 1; z0++) {
+			for (long y0 = y; y0 < y + sy; y0++) {
+				long x0 = x;
+				long myha = (z0 << 40) | (y0 << 20) | x0;
+				//Debug.Log ("HASH: " + myha);
+				if (ha.Contains (myha)) {
+					return true;
+				}
+				ha.Add (myha);
+			}
+		}
+		for (long z0 = z + 1; z0 < z + sz - 1; z0++) {
+			for (long y0 = y; y0 < y + sy; y0++) {
+				long x0 = x + sx - 1;
+				long myha = (z0 << 40) | (y0 << 20) | x0;
+				//Debug.Log ("HASH: " + myha);
+				if (ha.Contains (myha)) {
+					return true;
+				}
+				ha.Add (myha);
+			}
+		}
+		for (long x0 = x + 1; x0 < x + sx - 1; x0++) {
+			for (long z0 = z + 1; z0 < z + sz - 1; z0++) {
+				long y0 = y;
+				long myha = (z0 << 40) | (y0 << 20) | x0;
+				//Debug.Log ("HASH: " + myha);
+				if (ha.Contains (myha)) {
+					return true;
+				}
+				ha.Add (myha);
+			}
+		}
+		for (long x0 = x + 1; x0 < x + sx - 1; x0++) {
+			for (long z0 = z + 1; z0 < z + sz - 1; z0++) {
+				long y0 = y + sy - 1;
+				long myha = (z0 << 40) | (y0 << 20) | x0;
+				//Debug.Log ("HASH: " + myha);
+				if (ha.Contains (myha)) {
+					return true;
+				}
+				ha.Add (myha);
+			}
+		}
+		for (int i = 0; i < children.Length; i++) {
+			if (children [i] != null && i != parent) {
+				Vector3 relpos = getScaledPositionOfChild (i);
+				if (children [i].checkForSelfIntersect (ha, basex + relpos.x, basey + relpos.y, basez + relpos.z)) {
+					return true;
+				}
+			}
+		}
+		return false;
 	}
+	public Vector3 getScaledPositionOfChild(int child) {
+		return Vector3.Scale(scale, getPositionOfChild(child));
+	}
+	public void Randomize (int maxDepth, int totalDepth) {
+		for (int i = 0; i < 20; i++) {
+			if (Random.Range(0, 100) < (12 / totalDepth * maxDepth) && maxDepth > 0 && i != parent) {
+				children[i] = new CubeTreeNode (Random.Range(0, children.Length));
+				children[i].children [children[i].parent] = this;
+				children [i].Randomize (maxDepth - 1, totalDepth);
+			}
+		}
+	}
+
 	public GameObject generateMonster(Vector3 basePos, int depth, GameObject par) {
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
 		obj = o;
-		o.transform.localScale = new Vector3 (Random.Range(10, 100) / 20.0f, Random.Range(10, 100) / 20.0f, Random.Range(10,100) / 20.0f);
+		/*Material myMat = Material
+		myMat.color = new Color(Random.Range(0, 256) / 256.0f, Random.Range(0, 256) / 256.0f, Random.Range(0, 256) / 256.0f);*/
+		o.transform.localScale = scale;
 		//o.transform.localScale = new Vector3(1, 1, 1);
 		//o.transform.localScale = new Vector3(1, 1, 1);
 		o.AddComponent<Rigidbody> ();
@@ -163,13 +289,25 @@ public abstract class MonsterTreeNode {
 		if (par != null) {
 			//o.transform.SetParent (par.transform);
 			HingeJoint cj = o.AddComponent<HingeJoint> ();
+			cj.enableCollision = true;
+			cj.useMotor = true;
+			JointMotor jm = cj.motor;
+			int x = Random.Range (0, 3);
+			if (x == 0) {
+				cj.axis = new Vector3 (1, 0, 0);
+			} else if (x == 1) {
+				cj.axis = new Vector3 (0, 1, 0);
+			} else {
+				cj.axis = new Vector3 (0, 0, 1);
+			}
+			jm.targetVelocity = Random.Range(-1000, 1000);
+			jm.force = 250;
+			cj.motor = jm;
 			cj.connectedBody = par.transform.GetComponent<Rigidbody> ();
 			cj.anchor = getPositionOfChild (parent);
 		}
 		for (int i = 0; i < children.Length; i++) {
-			if (/*children [i] != null && i != parent*/ Random.Range(0, 100) < (100 / (depth + 5)) && depth < 3 && i != parent) {
-				children[i] = new CubeTreeNode (Random.Range(0, 20));
-				children[i].children [children[i].parent] = this;
+			if (children [i] != null && i != parent) {
 				children[i].generateMonster (o.transform.position + getScaledPositionOfChild(i), depth + 1, o);
 			}
 		}
@@ -181,6 +319,7 @@ public class CubeTreeNode : MonsterTreeNode {
 	public CubeTreeNode(int p = -1){
 		parent = p;
 		children = new MonsterTreeNode[20];
+		scale = new Vector3 (Random.Range (5, 50) / 10.0f, Random.Range (5, 50) / 10.0f, Random.Range (5, 50) / 10.0f);
 		//TODO: obj = makecube
 	}
 
