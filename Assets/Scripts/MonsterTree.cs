@@ -25,7 +25,7 @@ public class MonsterTree {
 		do {
 			Debug.Log("LOOPING: " + count);
 			Randomize (maxDepth);
-		} while((nodes.Count > 10 || nodes.Count <= 2 || selfIntersects ()) && (count++) < 100);
+		} while((nodes.Count > 20 || nodes.Count <= 1 || selfIntersects ()) && (count++) < 1000);
 	}
 
 	public bool selfIntersects(){
@@ -229,17 +229,23 @@ public class MonsterTree {
 		}		
 		return false;
 	}
-	public GameObject generateMonster() {
-		/*
-		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
-		Rigidbody rb = o.AddComponent<Rigidbody>();
-		GameObject o2 = GameObject.CreatePrimitive (PrimitiveType.Cube);
-		Rigidbody rb2 = o2.AddComponent<Rigidbody> (); 
-		o2.transform.Translate (new Vector3 (1, 0, 0));
-		HingeJoint hj = o2.AddComponent<HingeJoint> ();
-		hj.connectedBody = rb;
-		return o;*/
-		return root.generateMonster (new Vector3(0, 40, 0), 0, null);
+	public GameObject generateMonster(GameObject eye = null, Material m = null) {
+		GameObject o = root.generateMonster (new Vector3(0, 40, 0), 0, null, m, new Color(Random.Range(.5f, .8f), Random.Range(.5f, .8f), Random.Range(.5f, .8f)));
+		if (eye != null) {
+			float eyeSmall = .3f;
+			float eyeLarge = .5f;
+			float eyeSize = Random.Range (eyeSmall, eyeLarge); 
+			float eyeDiff = Random.Range (eyeSize / 2, .5f - eyeSize / 2);
+			GameObject e1 = GameObject.Instantiate (eye);
+			e1.transform.SetParent (o.transform);
+			e1.transform.localScale = new Vector3 (eyeSize, eyeSize, eyeSize / 2);
+			e1.transform.localPosition = new Vector3(-eyeDiff, 0, -.5f);
+			GameObject e2 = GameObject.Instantiate (eye);
+			e2.transform.SetParent (o.transform);
+			e2.transform.localScale = new Vector3 (eyeSize, eyeSize, eyeSize / 2);
+			e2.transform.localPosition = new Vector3(eyeDiff, 0, -.5f);
+		}
+		return o;
 	}
 }
 public abstract class MonsterTreeNode {
@@ -389,8 +395,13 @@ public abstract class MonsterTreeNode {
 		}
 	}
 
-	public GameObject generateMonster(Vector3 basePos, int depth, GameObject par) {
+	public GameObject generateMonster(Vector3 basePos, int depth, GameObject par, Material ma, Color co) {
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
+		if (ma != null) {
+			Material myMat = new Material (ma);
+			myMat.color = co;
+			o.GetComponent<Renderer> ().material = myMat;
+		}
 		//obj = o;
 		/*Material myMat = Material
 		myMat.color = new Color(Random.Range(0, 256) / 256.0f, Random.Range(0, 256) / 256.0f, Random.Range(0, 256) / 256.0f);*/
@@ -425,7 +436,22 @@ public abstract class MonsterTreeNode {
 		}
 		for (int i = 0; i < children.Length; i++) {
 			if (children [i] != null && i != parent) {
-				children[i].generateMonster (o.transform.position + getScaledPositionOfChild(i), depth + 1, o);
+				int r = Random.Range (0, 5);
+				Color touse;
+				float h, s, v;
+				Color.RGBToHSV (co, out h, out s, out v);
+				if (r == 0) {
+					touse = co;
+				} else if (r == 1) {
+					touse = new Color (1.2f * co.r, 1.2f * co.g, 1.2f * co.b);
+				} else if (r == 2) {
+					touse = new Color (.7f * co.r, .7f * co.g, .7f * co.b);
+				} else if (r == 3) {
+					touse = Color.HSVToRGB ((h + .1f) % 1, s, v);
+				} else {
+					touse = Color.HSVToRGB ((h + .9f) % 1, s, v);
+				}
+				children[i].generateMonster (o.transform.position + getScaledPositionOfChild(i), depth + 1, o, ma, touse);
 			}
 		}
 		return o;
