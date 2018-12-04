@@ -130,7 +130,7 @@ public class MonsterTree {
 		}
 		else{
 			//Grafting
-			return crossover(tree);
+			return graft(tree);
 		}
 	}
 	public GameObject generateMonster() {
