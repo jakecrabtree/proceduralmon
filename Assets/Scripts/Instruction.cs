@@ -4,52 +4,33 @@ using UnityEngine;
 
 public class Instruction {
 	//Represents a single instruction of a monster
-	int[] instruction; 
+	int jointNumber; 
+    float speed;
     
     //instruction[0] = the joint number
-    //instruction[1] = x torque
-    //instruction[2] = y torque
-    //instruction[3] = z torque
+    //instruction[1] = speed
     
-    public Instruction(int num, int x, int y, int z) {
-        instruction = new int[4];
-        instruction[0] = num;
-        instruction[1] = x;
-        instruction[2] = y;
-        instruction[3] = z;
+    public Instruction(int num, float sp) {
+        jointNumber = num;
+        speed = sp;
     }
     
     public void setNode(int num) {
-        instruction[0] = num;
+        jointNumber = num;
     }
     
-    public void setX(int num) {
-        instruction[1] = num;
-    }
-    
-    public void setY(int num) {
-        instruction[2] = num;
-    
-}    
-    public void setZ(int num) {
-        instruction[3] = num;
+    public void setSpeed(float num) {
+        speed = num;
     }
     
     public int getNode() {
-        return instruction[0];
+        return jointNumber;
     }
     
-    public int getX() {
-        return instruction[1];
+    public float getSpeed() {
+        return speed;
     }
     
-    public int getY() {
-        return instruction[2];
-    }
-    
-    public int getZ() {
-        return instruction[3];
-    }
 /* 
     public int[] DeepCopy(){
         return instruction.Copy();
