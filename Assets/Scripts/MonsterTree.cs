@@ -166,7 +166,6 @@ public class MonsterTree {
 			random = Random.Range(0.0f, 1.0f);
 			if (random <= 0.1f){
 				//Add a node at 10%
-				Debug.Log("Mutation added node");
 				MonsterTreeNode newNode = node.createEmptyClone();
 				List<int> freeNodePositions = new List<int>();
 				int count = 0;
@@ -185,7 +184,6 @@ public class MonsterTree {
 				}
 			}else if(random <= 0.2f){
 				//Remove a node at 10%
-				Debug.Log("Mutation removed node");
 				List<int> childNodePositions = new List<int>();
 				int count = 0;
 				foreach(MonsterTreeNode child in node.children){
@@ -200,7 +198,6 @@ public class MonsterTree {
 			}
 			else if (random <= 0.6f){
 				//Move a Connection at 40%
-				Debug.Log("Mutation moved node");
 				List<int> childNodePositions = new List<int>();
 				List<int> freeNodePositions = new List<int>();
 				int count = 0;
@@ -222,7 +219,6 @@ public class MonsterTree {
 			}
 			else{
 				//Scale at 40% 
-				Debug.Log("Mutation scaled node");
 				node.scale += node.randomScale() / 4.0f;
 				return true;
 			}
