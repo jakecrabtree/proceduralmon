@@ -7,6 +7,9 @@ public class MonsterTree {
 	public MonsterTreeNode root;
 	List<MonsterTreeNode> nodes;
 
+	private static GameObject eye = Resources.Load<GameObject>("Eye");
+	private static Material monsterMat = Resources.Load<Material>("MonsterBase");
+
 	private static readonly float MUTATION_CHANCE = 0.3f;
 
 	public MonsterTree(){
@@ -225,8 +228,8 @@ public class MonsterTree {
 		}		
 		return false;
 	}
-	public GameObject generateMonster(GameObject eye = null, Material m = null) {
-		GameObject o = root.generateMonster (new Vector3(0, 40, 0), 0, null, m, new Color(Random.Range(.5f, .8f), Random.Range(.5f, .8f), Random.Range(.5f, .8f)));
+	public GameObject generateMonster() {
+		GameObject o = root.generateMonster (new Vector3(0, 40, 0), 0, null, monsterMat, new Color(Random.Range(.5f, .8f), Random.Range(.5f, .8f), Random.Range(.5f, .8f)));
 		if (eye != null) {
 			float eyeSmall = .3f;
 			float eyeLarge = .5f;
