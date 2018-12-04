@@ -428,7 +428,7 @@ public abstract class MonsterTreeNode {
 			} else {
 				cj.axis = new Vector3 (0, 0, 1);
 			}
-			jm.targetVelocity = Random.Range(-1000, 1000);
+			jm.targetVelocity = Random.Range(-100000, 100000);
 			jm.force = 250;
 			cj.motor = jm;
 			cj.connectedBody = par.transform.GetComponent<Rigidbody> ();
