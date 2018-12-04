@@ -19,11 +19,37 @@ public class InstructionSet {
         instructionSet.Insert(index, i);
     }
 
-    public void getInstruction(int index){
-      //  instructionSet.Get
+    public Instruction getInstruction(int index){
+        return instructionSet[index];
     }
 
     public int getCount(){
         return instructionSet.Count;
+    }
+    
+    public void instructionSetGraft(int node, InstructionSet list) {
+        for (int i = 0; i < list.instructionSet.Count; i++){
+            Instruction inst = list.instructionSet[i];
+			if(inst.getNode() == node) {
+                instructionSet.Add(inst);
+            }
+		}
+    }
+    
+    public void instructionSetCrossover(InstructionSet other, int crossoverPoint) { //passed in
+        instructionSet.RemoveRange(crossoverPoint, instructionSet.Count - crossoverPoint);
+        int min = crossoverPoint < instructionSet.Count ? crossoverPoint : instructionSet.Count;
+		other.instructionSet.RemoveRange(0, min);
+		instructionSet.AddRange(other.instructionSet);
+    }
+    
+    public void removeNode(int node) {
+        for (int i = 0; i < instructionSet.Count; i++){
+            Instruction inst = instructionSet[i];
+			if(inst.getNode() == node) {
+                instructionSet.Remove(inst);
+                return;
+            }
+		}
     }
 }

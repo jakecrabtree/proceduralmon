@@ -63,7 +63,7 @@ public class MonsterTree {
 		return res;
 	}
 	private static int min(int a, int b){
-		return a > b ? a : b;
+		return a < b ? a : b;
 	}
 	private MonsterTree crossover(MonsterTree tree){
 		MonsterTree parent1 = this.clone();
