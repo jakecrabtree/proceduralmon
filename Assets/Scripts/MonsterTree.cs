@@ -7,6 +7,8 @@ public class MonsterTree {
 	public MonsterTreeNode root;
 	List<MonsterTreeNode> nodes;
 
+	private static readonly float MUTATION_CHANCE = 0.3f;
+
 	public MonsterTree(){
 		nodes = new List<MonsterTreeNode>();
 	}
@@ -133,6 +135,100 @@ public class MonsterTree {
 			return graft(tree);
 		}
 	}
+
+	public void mutate(){
+		bool selfCollides = false;
+		bool dirty = false;
+		MonsterTree copy = this.clone();
+		do {
+			for (int i = 0; i < copy.nodes.Count; ++i){
+				MonsterTreeNode node = nodes[i];
+				dirty |= mutateNode(node);
+			}
+			if (dirty && (selfCollides = selfIntersects())){
+				this.nodes = copy.nodes;
+				this.root = copy.root;
+				copy = clone();
+				dirty = false;
+			}
+		}
+		while (!((selfCollides && dirty) || !dirty));
+	}
+	public bool mutateNode(MonsterTreeNode node){
+		/**
+		* Add a node
+		* Remove a node
+		* Move a connection's or connections' position
+		* Change scale x, y, and z
+		**/
+		float random = Random.Range(0.0f, 1.0f);
+		if (random <= MUTATION_CHANCE){
+			random = Random.Range(0.0f, 1.0f);
+			if (random <= 0.1f){
+				//Add a node at 10%
+				Debug.Log("Mutation added node");
+				MonsterTreeNode newNode = node.createEmptyClone();
+				List<int> freeNodePositions = new List<int>();
+				int count = 0;
+				foreach(MonsterTreeNode child in node.children){
+					if (child == null){
+						freeNodePositions.Add(count);
+					}
+					++count;
+				}
+				if(freeNodePositions.Count != 0){
+					int rand = Random.Range(0,freeNodePositions.Count);
+					int pos = freeNodePositions[rand];
+					node.children[pos] = newNode;
+					this.nodes.Add(newNode);
+					return true;		
+				}
+			}else if(random <= 0.2f){
+				//Remove a node at 10%
+				Debug.Log("Mutation removed node");
+				List<int> childNodePositions = new List<int>();
+				int count = 0;
+				foreach(MonsterTreeNode child in node.children){
+					if (count != node.parent && child != null){
+						childNodePositions.Add(count);
+					}
+					++count;
+				}
+				if(childNodePositions.Count != 0){
+					node.children[childNodePositions[Random.Range(0,childNodePositions.Count)]] = null;
+				}
+			}
+			else if (random <= 0.6f){
+				//Move a Connection at 40%
+				Debug.Log("Mutation moved node");
+				List<int> childNodePositions = new List<int>();
+				List<int> freeNodePositions = new List<int>();
+				int count = 0;
+				foreach(MonsterTreeNode child in node.children){
+					if (count != node.parent && child != null){
+						childNodePositions.Add(count);
+					}
+					else if (count != node.parent){
+						freeNodePositions.Add(count);
+					}
+					++count;
+				}
+				if(childNodePositions.Count > 0){
+					MonsterTreeNode nodeToBeMoved = node.children[childNodePositions[Random.Range(0, childNodePositions.Count)]];
+					int insertionPos = Random.Range(0, freeNodePositions.Count);
+					node.children[insertionPos] = nodeToBeMoved;
+					return true;
+				}
+			}
+			else{
+				//Scale at 40% 
+				Debug.Log("Mutation scaled node");
+				node.scale += node.randomScale() / 4.0f;
+				return true;
+			}
+		}		
+		return false;
+	}
 	public GameObject generateMonster() {
 		/*
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
@@ -152,9 +248,8 @@ public abstract class MonsterTreeNode {
 	public int parent;
 	public Vector3 scale;
 	public abstract Vector3 getPositionOfChild(int child);
-	protected abstract MonsterTreeNode createEmptyClone();
+	public abstract MonsterTreeNode createEmptyClone();
 
-	private static readonly float MUTATION_CHANCE = 0.01f;
 
 	//Does NOT clone children, only local data to the node
 	public MonsterTreeNode LocalClone(){
@@ -167,10 +262,8 @@ public abstract class MonsterTreeNode {
 		return cloneNode;
 	}
 
-	public MonsterTreeNode mutate(){
-		//TODO: perform mutations
-		return this;
-	}
+	public abstract Vector3 randomScale();
+	
 
 	private MonsterTreeNode CopySubTreeHelper(List<MonsterTreeNode> nodes, MonsterTreeNode parentNode){
 		MonsterTreeNode copyNode = this.LocalClone();
@@ -343,11 +436,15 @@ public class CubeTreeNode : MonsterTreeNode {
 	public CubeTreeNode(int p = -1){
 		parent = p;
 		children = new MonsterTreeNode[20];
-		scale = new Vector3 (Random.Range (5, 50) / 10.0f, Random.Range (5, 50) / 10.0f, Random.Range (5, 50) / 10.0f);
+		scale = randomScale();
 		//TODO: obj = makecube
 	}
 
-	protected override MonsterTreeNode createEmptyClone(){
+	public override Vector3 randomScale(){
+		return new Vector3 (Random.Range (5, 50) / 10.0f, Random.Range (5, 50) / 10.0f, Random.Range (5, 50) / 10.0f);
+	}
+
+	public override MonsterTreeNode createEmptyClone(){
 		return new CubeTreeNode();
 	}
 	public override Vector3 getPositionOfChild(int child){
