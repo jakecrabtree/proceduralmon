@@ -49,58 +49,75 @@ public class MonsterTree {
 		
 		//Select Node from param's tree
 		int targetIndex = Random.Range(0, tree.nodes.Count);
-		MonsterTreeNode targetNode = nodes[targetIndex];
+		MonsterTreeNode targetNode = tree.nodes[targetIndex];
 
 		//Copy Caller's Tree and target's subtree
 		MonsterTree res = this.clone();
-		Dictionary<MonsterTreeNode, int> callerMap = new Dictionary<MonsterTreeNode, int>();
-		for (int i = 0; i < res.nodes.Count; ++i){
-			callerMap.Add(res.nodes[i], i);
-		}
-		if(index+1 < res.nodes.Count){
-			res.nodes.RemoveRange(index+1, res.nodes.Count-index-1);
-		}
-		foreach(MonsterTreeNode currNode in res.nodes){
-			for(int c = 0; c < currNode.children.Length; ++c){
-				MonsterTreeNode child = currNode.children[c];
-				if (child == null || c == currNode.parent) continue;
-				if (callerMap[child] > index){
-					currNode.children[c] = null;
-				}
-			}
-		}
 		List<MonsterTreeNode> newNodes = targetNode.CopySubTree();
+
+		//Insert into Caller and add target's nodes to caller's list
 		res.nodes[index].children[insertionPos] = newNodes[0];
 		res.nodes.AddRange(newNodes);
 		return res;
 	}
+	private static int min(int a, int b){
+		return a > b ? a : b;
+	}
 	private MonsterTree crossover(MonsterTree tree){
-	//	MonsterTree res = this.clone();
+		MonsterTree parent1 = this.clone();
+		MonsterTree parent2 = tree.clone();
 		//Get positions of all the caller's nodes
-	//	Dictionary<MonsterTreeNode, int> callerMap = new Dictionary<MonsterTreeNode, int>();
-	//	for (int i = 0; i < res.nodes.Count; ++i){
-	//		callerMap.Add(res.nodes[i], i);
-	//	}
+		Dictionary<MonsterTreeNode, int> parent1Map = new Dictionary<MonsterTreeNode, int>();
+		for (int i = 0; i < parent1.nodes.Count; ++i){
+			parent1Map.Add(parent1.nodes[i], i);
+		}
 		//Get positions of all the param's nodes
-		Dictionary<MonsterTreeNode, int> paramMap = new Dictionary<MonsterTreeNode, int>();
-		for (int i = 0; i < tree.nodes.Count; ++i){
-			paramMap.Add(tree.nodes[i], i);
+		Dictionary<MonsterTreeNode, int> parent2Map = new Dictionary<MonsterTreeNode, int>();
+		for (int i = 0; i < parent2.nodes.Count; ++i){
+			parent2Map.Add(parent2.nodes[i], i);
 		}
 
-		//Find Crossover Point
-		int crossoverPoint = Random.Range(0, nodes.Count);
+		//Find Crossover Point (one for simplicity)
+		int crossoverPoint = Random.Range(0, parent1.nodes.Count);
 		
-		/* 	for (int i = crossoverPoint; i < tree.nodes.Count; ++i){
-			MonsterTreeNode currNode = res.nodes[i];
+		//Combine node lists bases on crossover in first parent
+		parent1.nodes.RemoveRange(crossoverPoint, parent1.nodes.Count - crossoverPoint);
+		parent2.nodes.RemoveRange(0, min(crossoverPoint,parent2.nodes.Count));
+		parent1.nodes.AddRange(parent2.nodes);
+
+		//Remap Parent1's nodes
+		for (int i = 0; i < crossoverPoint; ++i){
+			MonsterTreeNode currNode = parent1.nodes[i];
 			for(int c = 0; c < currNode.children.Length; ++c){
 				MonsterTreeNode child = currNode.children[c];
 				if (child == null || c == currNode.parent) continue;
-				int childPos = [child];
+				int childPos = parent1Map[child];
+				if (childPos < parent1.nodes.Count){
+					currNode.children[c] = parent1.nodes[childPos];
+				}
+				else{
+					//TODO: Change to random index if cycles can work
+					currNode.children[c] = null;
+				}
 			}
-		}*/
-
-		
-		return graft(tree);
+		}
+		//Remap Parent2's nodes
+		for (int i = crossoverPoint; i < parent1.nodes.Count; ++i){
+			MonsterTreeNode currNode = parent1.nodes[i];
+			for(int c = 0; c < currNode.children.Length; ++c){
+				MonsterTreeNode child = currNode.children[c];
+				if (child == null || c == currNode.parent) continue;
+				int childPos = parent2Map[child];
+				if (childPos < parent1.nodes.Count){
+					currNode.children[c] = parent1.nodes[childPos];
+				}
+				else{
+					//TODO: Change to random index if cycles can work
+					currNode.children[c] = null;
+				}
+			}
+		}
+		return parent1;
 	}
 	public MonsterTree asexual(){
 		return this.clone();
@@ -113,7 +130,7 @@ public class MonsterTree {
 		}
 		else{
 			//Grafting
-			return graft(tree);
+			return crossover(tree);
 		}
 	}
 	public GameObject generateMonster() {
@@ -131,11 +148,13 @@ public class MonsterTree {
 }
 public abstract class MonsterTreeNode {
 	public MonsterTreeNode[] children;
-	public GameObject obj;
+	//public GameObject obj;
 	public int parent;
 	public Vector3 scale;
 	public abstract Vector3 getPositionOfChild(int child);
 	protected abstract MonsterTreeNode createEmptyClone();
+
+	private static readonly float MUTATION_CHANCE = 0.01f;
 
 	//Does NOT clone children, only local data to the node
 	public MonsterTreeNode LocalClone(){
@@ -146,6 +165,11 @@ public abstract class MonsterTreeNode {
 		cloneNode.children = new MonsterTreeNode[children.Length];
 		cloneNode.scale = scale;
 		return cloneNode;
+	}
+
+	public MonsterTreeNode mutate(){
+		//TODO: perform mutations
+		return this;
 	}
 
 	private MonsterTreeNode CopySubTreeHelper(List<MonsterTreeNode> nodes, MonsterTreeNode parentNode){
@@ -274,7 +298,7 @@ public abstract class MonsterTreeNode {
 
 	public GameObject generateMonster(Vector3 basePos, int depth, GameObject par) {
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
-		obj = o;
+		//obj = o;
 		/*Material myMat = Material
 		myMat.color = new Color(Random.Range(0, 256) / 256.0f, Random.Range(0, 256) / 256.0f, Random.Range(0, 256) / 256.0f);*/
 		o.transform.localScale = scale;
