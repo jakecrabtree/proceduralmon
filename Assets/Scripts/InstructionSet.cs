@@ -10,6 +10,15 @@ public class InstructionSet {
         instructionSet = new List<Instruction>();
     }
     
+    public InstructionSet(int numNodes) { //a constructor that creates a set of random instructions for numNodes
+        int numInstructions = Random.Range (1, numNodes * 2);
+        for(int i=0; i<numInstructions; i++) {
+            int node = Random.Range(0, numNodes);
+            int speed = Random.Range(-1000, 1000);
+            instructionSet.Add(new Instruction(node, speed));
+        }
+    }
+    
     public void addInstruction(Instruction i) {
         instructionSet.Add(i);
     }
