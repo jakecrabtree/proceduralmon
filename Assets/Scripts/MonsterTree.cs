@@ -229,7 +229,10 @@ public class MonsterTree {
 		return false;
 	}
 	public GameObject generateMonster() {
-		GameObject o = root.generateMonster (new Vector3(0, 40, 0), 0, null, monsterMat, new Color(Random.Range(.5f, .8f), Random.Range(.5f, .8f), Random.Range(.5f, .8f)));
+		List<GameObject> goList = new List<GameObject> ();
+		GameObject o = root.generateMonster (new Vector3(0, 40, 0), 0, null, monsterMat, new Color(Random.Range(.5f, .8f), Random.Range(.5f, .8f), Random.Range(.5f, .8f)), goList);
+		Creature cr = o.AddComponent<Creature> ();
+		cr.nodeSetup(goList);
 		if (eye != null) {
 			float eyeSmall = .3f;
 			float eyeLarge = .5f;
@@ -394,8 +397,9 @@ public abstract class MonsterTreeNode {
 		}
 	}
 
-	public GameObject generateMonster(Vector3 basePos, int depth, GameObject par, Material ma, Color co) {
+	public GameObject generateMonster(Vector3 basePos, int depth, GameObject par, Material ma, Color co, List<GameObject> goList) {
 		GameObject o = GameObject.CreatePrimitive (PrimitiveType.Cube);
+		goList.Add (o);
 		if (ma != null) {
 			Material myMat = new Material (ma);
 			myMat.color = co;
@@ -427,8 +431,8 @@ public abstract class MonsterTreeNode {
 			} else {
 				cj.axis = new Vector3 (0, 0, 1);
 			}
-			jm.targetVelocity = Random.Range(-100000, 100000);
-			jm.force = 250;
+			//jm.targetVelocity = Random.Range(-1000, 1000);
+			jm.force = 300;
 			cj.motor = jm;
 			cj.connectedBody = par.transform.GetComponent<Rigidbody> ();
 			cj.anchor = getPositionOfChild (parent);
@@ -450,7 +454,7 @@ public abstract class MonsterTreeNode {
 				} else {
 					touse = Color.HSVToRGB ((h + .9f) % 1, s, v);
 				}
-				children[i].generateMonster (o.transform.position + getScaledPositionOfChild(i), depth + 1, o, ma, touse);
+				children[i].generateMonster (o.transform.position + getScaledPositionOfChild(i), depth + 1, o, ma, touse, goList);
 			}
 		}
 		return o;
@@ -473,8 +477,8 @@ public class CubeTreeNode : MonsterTreeNode {
 		return new CubeTreeNode();
 	}
 	public override Vector3 getPositionOfChild(int child){
-		float L = -0.5f;
-		float H = 0.5f;
+		float L = -0.5005f;
+		float H = 0.5005f;
 		if (child < 8) {
 			float x = ((child & 1) == 0) ? L : H;
 			float y = (((child >> 1) & 1) == 0) ? L : H;
