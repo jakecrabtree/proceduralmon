@@ -31,8 +31,8 @@ public class Instruction {
         return speed;
     }
     
-/* 
-    public int[] DeepCopy(){
-        return instruction.Copy();
-    }*/
+    //Returns a deep copy of an instruction
+    public Instruction copy(){
+        return new Instruction(jointNumber, speed);
+    }
 }
