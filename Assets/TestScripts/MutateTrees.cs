@@ -22,7 +22,7 @@ public class MutateTrees : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.M) && trees.Count > 0) {
 			Debug.Log("mutating");
 			MonsterTree t = trees[0].asexual();
-			t.mutate();
+			t.Mutate();
 			t.generateMonster ();
 			trees.Add(t);
 		}
