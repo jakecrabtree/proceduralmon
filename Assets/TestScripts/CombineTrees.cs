@@ -4,27 +4,26 @@ using UnityEngine;
 
 public class CombineTrees : MonoBehaviour {
 
-	List<MonsterTree> trees;
+	List<Monster> monsters;
 	// Use this for initialization
 	void Start () {
-		trees = new List<MonsterTree>();
+		monsters = new List<Monster>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown (KeyCode.Space)) {
-			MonsterTree t = new MonsterTree ();
-			t.RandomizeUntilSane (3);
-			t.generateMonster ();
-			trees.Add(t);
+			Monster m = new Monster(3);
+			m.GenerateMonster ();
+			monsters.Add(m);
 		}
-		if (Input.GetKeyDown (KeyCode.Alpha1) && trees.Count > 0) {
-			MonsterTree t = trees[0].asexual();
-			t.generateMonster ();
+		if (Input.GetKeyDown (KeyCode.Alpha1) && monsters.Count > 0) {
+			Monster m = monsters[0].Asexual();
+			m.GenerateMonster ();
 		}
-		if (Input.GetKeyDown (KeyCode.B) && trees.Count >= 2) {
-			MonsterTree t = trees[0].Breed(trees[1]);
-			t.generateMonster ();
+		if (Input.GetKeyDown (KeyCode.B) && monsters.Count >= 2) {
+			Monster m = monsters[0].Breed(monsters[1]);
+			m.GenerateMonster ();
 		}
 	}
 }

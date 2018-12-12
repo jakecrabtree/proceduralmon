@@ -131,12 +131,12 @@ public class MonsterTree {
 		}
 		return parent1;
 	}
-	public MonsterTree asexual(){
+	public MonsterTree Asexual(){
 		return this.clone();
 	}
 	public MonsterTree Breed(MonsterTree tree){
 		float type = UnityEngine.Random.Range(0.0f,1.0f);
-		if(type <= 0.5f){
+		if(type <= Monster.CROSSOVER_CHANCE){
 			//Crossover
 			return crossover(tree);
 		}
@@ -239,15 +239,7 @@ public class MonsterTree {
 		List<GameObject> goList = new List<GameObject> ();
 		GameObject o = root.generateMonster (new Vector3(0, 40, 0), 0, null, monsterMat, new Color(Random.Range(.5f, .8f), Random.Range(.5f, .8f), Random.Range(.5f, .8f)), goList);
 		Creature cr = o.AddComponent<Creature> ();
-		if (monster != null){
-			if (monster.set.getCount() == 0){
-				monster.SetInstructions(new InstructionSet(goList.Count));
-			}
-			cr.nodeSetup(goList, monster.set);
-		}
-		else{
-			cr.nodeSetup(goList);
-		}
+		cr.nodeSetup(goList, monster.GetInstructions());
 		if (eye != null) {
 			float eyeSmall = .3f;
 			float eyeLarge = .5f;

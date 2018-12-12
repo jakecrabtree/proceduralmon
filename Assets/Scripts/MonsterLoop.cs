@@ -13,9 +13,8 @@ public class MonsterLoop : MonoBehaviour {
 	private static readonly float FITNESS_WRITEOUT_CUTOFF = 100; //TODO: Change me
 
 
-
-	
 	private List<Monster> generation;
+	int currentMonster;
 
 	void Awake(){
 		if (instance == null){
@@ -23,12 +22,22 @@ public class MonsterLoop : MonoBehaviour {
 		}
 		else{
 			Destroy(gameObject);
+			return;
 		}
 		DontDestroyOnLoad(gameObject);
+		InitializeGeneration();
+	}
+
+	void InitializeGeneration(){
 		generation = new List<Monster>();
 		for (int i = 0; i < INITIAL_GENERATION_SIZE; ++i){
 			generation.Add(new Monster(INITIAL_MONSTER_TREE_DEPTH));
 		}
+		currentMonster = 0;
+	}
+
+	void RunIteration(){
+		//generation[currentMonster].
 	}
 
 	// Use this for initialization

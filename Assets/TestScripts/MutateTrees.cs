@@ -5,26 +5,25 @@ using UnityEngine;
 public class MutateTrees : MonoBehaviour {
 
 	// Use this for initialization
-	List<MonsterTree> trees;
+	List<Monster> monsters;
 	// Use this for initialization
 	void Start () {
-		trees = new List<MonsterTree>();
+		monsters = new List<Monster>();
 	}
 	
 	// Update is called once per frame
 	void Update () {
 		if (Input.GetKeyDown (KeyCode.Space)) {
-			MonsterTree t = new MonsterTree ();
-			t.RandomizeUntilSane (3);
-			t.generateMonster ();
-			trees.Add(t);
+			Monster m = new Monster(3);
+			m.GenerateMonster ();
+			monsters.Add(m);
 		}
-		if (Input.GetKeyDown (KeyCode.M) && trees.Count > 0) {
+		if (Input.GetKeyDown (KeyCode.M) && monsters.Count > 0) {
 			Debug.Log("mutating");
-			MonsterTree t = trees[0].asexual();
-			t.Mutate();
-			t.generateMonster ();
-			trees.Add(t);
+			Monster m = monsters[0].Asexual();
+			m.Mutate();
+			m.GenerateMonster ();
+			monsters.Add(m);
 		}
 	}
 }

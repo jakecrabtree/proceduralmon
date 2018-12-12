@@ -4,10 +4,10 @@ using UnityEngine;
 
 public class Monster {
 	//Represents the Monster's geometry
-	public MonsterTree tree;
+	private MonsterTree tree;
 
 	//Represents the Monster's instruction set
-	public InstructionSet set;
+	private InstructionSet set;
 
 	//Fitness value
 	public float fitness = 0;
@@ -46,20 +46,43 @@ public class Monster {
 		this.tree.monster = this;
 	}
 
+	public InstructionSet GetInstructions(){
+		return set;
+	}
+
+	public MonsterTree GetMonsterTree(){
+		return tree;
+	}
+
 	public void Randomize(int treeDepth){
 		tree.RandomizeUntilSane(treeDepth);
 		SetInstructions(new InstructionSet(tree.NodeCount()));
 	}
 
 	public Monster Breed(Monster other){
-		MonsterTree tree = this.tree.Breed(other.tree);
-		InstructionSet set = new InstructionSet(); //TODO: replace with set.Breed(other.set);
-		return new Monster(tree, set);
+		float rand = Random.Range(0.0f, 1.0f);
+		if (rand <= ASEXUAL_CHANCE){
+			MonsterTree childTree = this.tree.Breed(other.tree);
+			InstructionSet childSet = new InstructionSet(childTree.NodeCount()); //TODO: replace with set.Breed(other.set);
+			return new Monster(childTree, childSet);
+		}else{
+			return Asexual();
+		}
+	}
+
+	public Monster Asexual(){
+		MonsterTree childTree = this.tree.Asexual();
+		InstructionSet childSet = new InstructionSet(childTree.NodeCount()); //TODO: replace with set.Asexual();
+		return new Monster(childTree, childSet);	
 	}
 
 	public void Mutate(){
 		tree.Mutate();
 		//TODO: add set.Mutate();
+	}
+
+	public void GenerateMonster(){
+		tree.generateMonster();
 	}
 
 	public void WriteToFile(){
