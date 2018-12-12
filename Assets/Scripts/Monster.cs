@@ -9,8 +9,11 @@ public class Monster {
 	//Represents the Monster's instruction set
 	public InstructionSet set;
 
-	public static readonly float CROSSOVER_CHANCE = 0.5f;
+	//Fitness value
+	public float fitness = 0;
+
 	public static readonly float ASEXUAL_CHANCE = 0.6f;
+	public static readonly float CROSSOVER_CHANCE = 0.5f;
 
 	public Monster(){
 		SetMonsterTree(new MonsterTree());
@@ -59,4 +62,11 @@ public class Monster {
 		//TODO: add set.Mutate();
 	}
 
+	public void WriteToFile(){
+
+	}
+
+	public void ReadFromFile(){
+
+	}
 }
