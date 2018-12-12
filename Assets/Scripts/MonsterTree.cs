@@ -7,6 +7,9 @@ public class MonsterTree {
 	public MonsterTreeNode root;
 	List<MonsterTreeNode> nodes;
 
+	//The Monster this monster tree belongs to
+	public Monster monster;
+
 	private static GameObject eye = Resources.Load<GameObject>("Eye");
 	private static Material monsterMat = Resources.Load<Material>("MonsterBase");
 
@@ -20,6 +23,10 @@ public class MonsterTree {
 		root = new CubeTreeNode (-1);
 		root.Randomize(maxDepth, maxDepth);
 		nodes = root.CopySubTree ();
+	}
+
+	public int NodeCount(){
+		return nodes.Count;
 	}
 
 	public void RandomizeUntilSane(int maxDepth){
@@ -127,7 +134,7 @@ public class MonsterTree {
 	public MonsterTree asexual(){
 		return this.clone();
 	}
-	public MonsterTree breed(MonsterTree tree){
+	public MonsterTree Breed(MonsterTree tree){
 		float type = UnityEngine.Random.Range(0.0f,1.0f);
 		if(type <= 0.5f){
 			//Crossover
@@ -139,7 +146,7 @@ public class MonsterTree {
 		}
 	}
 
-	public void mutate(){
+	public void Mutate(){
 		bool selfCollides = false;
 		bool dirty = false;
 		MonsterTree copy = this.clone();
@@ -232,7 +239,15 @@ public class MonsterTree {
 		List<GameObject> goList = new List<GameObject> ();
 		GameObject o = root.generateMonster (new Vector3(0, 40, 0), 0, null, monsterMat, new Color(Random.Range(.5f, .8f), Random.Range(.5f, .8f), Random.Range(.5f, .8f)), goList);
 		Creature cr = o.AddComponent<Creature> ();
-		cr.nodeSetup(goList);
+		if (monster != null){
+			if (monster.set.getCount() == 0){
+				monster.SetInstructions(new InstructionSet(goList.Count));
+			}
+			cr.nodeSetup(goList, monster.set);
+		}
+		else{
+			cr.nodeSetup(goList);
+		}
 		if (eye != null) {
 			float eyeSmall = .3f;
 			float eyeLarge = .5f;

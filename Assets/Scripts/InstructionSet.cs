@@ -6,6 +6,8 @@ public class InstructionSet {
 	//Represents an instruction set of a monster
 	List<Instruction> instructionSet;
 
+    public Monster monster;
+
     public InstructionSet() {
         instructionSet = new List<Instruction>();
     }

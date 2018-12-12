@@ -23,7 +23,7 @@ public class CombineTrees : MonoBehaviour {
 			t.generateMonster ();
 		}
 		if (Input.GetKeyDown (KeyCode.B) && trees.Count >= 2) {
-			MonsterTree t = trees[0].breed(trees[1]);
+			MonsterTree t = trees[0].Breed(trees[1]);
 			t.generateMonster ();
 		}
 	}

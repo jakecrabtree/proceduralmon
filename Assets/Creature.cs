@@ -13,6 +13,12 @@ public class Creature : MonoBehaviour {
 		myInstructions = new InstructionSet (n.Count);
 		isSetup = true;
 	}
+
+	public void nodeSetup(List<GameObject> n, InstructionSet set) {
+		nodes = n;
+		myInstructions = set;
+		isSetup = true;
+	}
 	// Use this for initialization
 	void Start () {
 
