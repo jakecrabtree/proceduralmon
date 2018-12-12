@@ -6,8 +6,6 @@ public class InstructionSet {
 	//Represents an instruction set of a monster
 	List<Instruction> instructionSet;
 
-    public Monster monster;
-
     public InstructionSet() {
         instructionSet = new List<Instruction>();
     }
@@ -39,20 +37,30 @@ public class InstructionSet {
         return instructionSet.Count;
     }
     
-    public void instructionSetGraft(int node, InstructionSet list) {
+    public List<Instruction> instructionSetGraft(int node, InstructionSet list) {
+        List<Instruction> newInstructionSet = new List<Instruction>();
+        for (int i = 0; i < instructionSet.Count; i++) {
+            newInstructionSet.Add(instructionSet[i]);
+        }
         for (int i = 0; i < list.instructionSet.Count; i++){
             Instruction inst = list.instructionSet[i];
 			if(inst.getNode() == node) {
-                instructionSet.Add(inst);
+                newInstructionSet.Add(inst);
             }
 		}
+        return newInstructionSet;
     }
     
-    public void instructionSetCrossover(InstructionSet other, int crossoverPoint) { //passed in
-        instructionSet.RemoveRange(crossoverPoint, instructionSet.Count - crossoverPoint);
+    public List<Instruction> instructionSetCrossover(InstructionSet other, int crossoverPoint) { //passed in
+        List<Instruction> newInstructionSet = new List<Instruction>();
+        for (int i = 0; i < instructionSet.Count; i++) {
+            newInstructionSet.Add(instructionSet[i]);
+        }
+        newInstructionSet.RemoveRange(crossoverPoint, instructionSet.Count - crossoverPoint);
         int min = crossoverPoint < instructionSet.Count ? crossoverPoint : instructionSet.Count;
 		other.instructionSet.RemoveRange(0, min);
-		instructionSet.AddRange(other.instructionSet);
+		newInstructionSet.AddRange(other.instructionSet);
+        return newInstructionSet;
     }
     
     public void removeNode(int node) {
