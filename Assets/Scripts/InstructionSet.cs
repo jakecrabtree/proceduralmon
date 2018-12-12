@@ -3,6 +3,9 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class InstructionSet {
+
+    public Monster monster;
+
 	//Represents an instruction set of a monster
 	List<Instruction> instructionSet;
 
