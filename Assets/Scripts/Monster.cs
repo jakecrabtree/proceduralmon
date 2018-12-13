@@ -123,6 +123,10 @@ public class Monster {
 	public void GenerateMonster(){
 		tree.generateMonster();
 	}
+    
+    public void GenerateMonsterAtPosition(Vector3 pos) {
+        tree.generateMonsterAtPosition(pos);
+    }
 
 	public void WriteToFile(){
 

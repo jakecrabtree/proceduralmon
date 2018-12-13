@@ -12,7 +12,7 @@ public class ArrangeMonsters : MonoBehaviour {
         
         for(int i=0; i<4; i++) {
        		Monster m = new Monster(3);
-            m.GenerateMonster ();
+            m.GenerateMonsterAtPosition (new Vector3(10 * i, 0, 0));
         }
 	}
 	
