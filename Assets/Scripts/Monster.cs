@@ -37,6 +37,11 @@ public class Monster {
 		SetInstructions(set);
 	}
 
+	//Deserialization constructor, bool is useless but avoids name conflict
+	private Monster(bool b) {
+
+	}
+
 	public void SetInstructions(InstructionSet set){
 		this.set = set;
 		this.set.monster = this;
@@ -190,10 +195,64 @@ public class Monster {
 		string name = "Monsters/" + name1 + "-" + name2 + ".mon";
 		System.IO.FileStream f = new System.IO.FileStream (name, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write);
 		f.Write (bytes, 0, bytes.Length);
+		f.Close ();
 		return name;
 	}
 
-	public void ReadFromFile(){
-
+	public static Monster ReadFromFile(string filename){
+		System.IO.FileStream f = new System.IO.FileStream (filename, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+		Monster m = new Monster (true);
+		byte[] bytes = new byte[8];
+		f.Read (bytes, 0, 4);
+		m.fitness = System.BitConverter.ToSingle (bytes, 0);
+		f.Read (bytes, 0, 4);
+		int icount = System.BitConverter.ToInt32 (bytes, 0);
+		List<Instruction> il = new List<Instruction> ();
+		for (int i = 0; i < icount; i++) {
+			f.Read (bytes, 0, 4);
+			int n = System.BitConverter.ToInt32 (bytes, 0);
+			f.Read (bytes, 0, 4);
+			float s = System.BitConverter.ToSingle (bytes, 0);
+			il.Add (new Instruction (n, s));
+		}
+		m.set = new InstructionSet (il);
+		f.Read (bytes, 0, 4);
+		int ncount = System.BitConverter.ToInt32 (bytes, 0);
+		List<MonsterTreeNode> mtnl = new List<MonsterTreeNode> ();
+		int[,] links = new int[ncount, 20];
+		for (int i = 0; i < ncount; i++) {
+			CubeTreeNode mtn = new CubeTreeNode ();
+			f.Read (bytes, 0, 4);
+			mtn.parent = System.BitConverter.ToInt32 (bytes, 0);
+			f.Read (bytes, 0, 4);
+			mtn.scale.x = System.BitConverter.ToSingle (bytes, 0);
+			f.Read (bytes, 0, 4);
+			mtn.scale.y = System.BitConverter.ToSingle (bytes, 0);
+			f.Read (bytes, 0, 4);
+			mtn.scale.z = System.BitConverter.ToSingle (bytes, 0);
+			for (int j = 0; j < 20; j++) {
+				f.Read (bytes, 0, 4);
+				links[i, j] = System.BitConverter.ToInt32 (bytes, 0);
+			}
+			mtnl.Add (mtn);
+		}
+		//Now actually link them
+		for (int i = 0; i < ncount; i++) {
+			MonsterTreeNode mtn = mtnl [i];
+			for (int j = 0; j < 20; j++) {
+				if (links[i, j] == -1) {
+					mtn.children [j] = null;
+				} else {
+					mtn.children [j] = mtnl [links [i, j]];
+				}
+			}
+		}
+		MonsterTree mt = new MonsterTree ();
+		mt.nodes = mtnl;
+		mt.root = mtnl [0];
+		mt.monster = m;
+		m.tree = mt;
+		f.Close ();
+		return m;
 	}
 }

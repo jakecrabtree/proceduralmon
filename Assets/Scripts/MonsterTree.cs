@@ -22,7 +22,7 @@ public class MonsterTree {
 	private void Randomize(int maxDepth){
 		root = new CubeTreeNode (-1);
 		root.Randomize(maxDepth, maxDepth);
-		nodes = root.CopySubTree ();
+		nodes = root.GetSubTree ();
 	}
 
 	public int NodeCount(){

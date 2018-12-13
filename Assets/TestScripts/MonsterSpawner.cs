@@ -16,7 +16,10 @@ public class MonsterSpawner : MonoBehaviour {
 		if (Input.GetKeyDown (KeyCode.Space)) {
 			Monster m = new Monster(3);
 			m.GenerateMonster ();
-			Debug.Log("Wrote to " + m.WriteToFile ());
+			string fn = m.WriteToFile ();
+			Debug.Log("Wrote to " + fn);
+			Monster m2 = Monster.ReadFromFile (fn);
+			m2.GenerateMonster ();
 		}
 	}
 
