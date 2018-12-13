@@ -20,7 +20,7 @@ public class MonsterTree {
 	private void Randomize(int maxDepth){
 		root = new CubeTreeNode (-1);
 		root.Randomize(maxDepth, maxDepth);
-		nodes = root.CopySubTree ();
+		nodes = root.GetSubTree ();
 	}
 
 	public int NodeCount(){
@@ -268,6 +268,29 @@ public class MonsterTree {
 		}
 		return o;
 	}
+    
+    public GameObject generateMonsterAtPosition(Vector3 pos) {
+		List<GameObject> goList = new List<GameObject> ();
+		GameObject o = root.generateMonster (pos, 0, null, monsterMat, new Color(Random.Range(.5f, .8f), Random.Range(.5f, .8f), Random.Range(.5f, .8f)), goList);
+		Creature cr = o.AddComponent<Creature> ();
+		cr.nodeSetup(goList, monster.GetInstructions());
+        cr.setShouldWalk(false);
+		if (eye != null) {
+			float eyeSmall = .3f;
+			float eyeLarge = .5f;
+			float eyeSize = Random.Range (eyeSmall, eyeLarge); 
+			float eyeDiff = Random.Range (eyeSize / 2, .5f - eyeSize / 2);
+			GameObject e1 = GameObject.Instantiate (eye);
+			e1.transform.SetParent (o.transform);
+			e1.transform.localScale = new Vector3 (eyeSize, eyeSize, eyeSize / 2);
+			e1.transform.localPosition = new Vector3(-eyeDiff, 0, -.5f);
+			GameObject e2 = GameObject.Instantiate (eye);
+			e2.transform.SetParent (o.transform);
+			e2.transform.localScale = new Vector3 (eyeSize, eyeSize, eyeSize / 2);
+			e2.transform.localPosition = new Vector3(eyeDiff, 0, -.5f);
+		}
+		return o;
+	}
 }
 public abstract class MonsterTreeNode {
 	public MonsterTreeNode[] children;
@@ -300,7 +323,10 @@ public abstract class MonsterTreeNode {
 	}
 
 	public abstract Vector3 randomScale();
-	
+
+	private void getNodesList() {
+
+	}
 
 	private MonsterTreeNode CopySubTreeHelper(List<MonsterTreeNode> nodes, MonsterTreeNode parentNode){
 		MonsterTreeNode copyNode = this.LocalClone();
