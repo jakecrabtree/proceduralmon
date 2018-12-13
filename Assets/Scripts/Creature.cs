@@ -31,7 +31,7 @@ public class Creature : MonoBehaviour {
 
     // Gets instruction and set's the JointMotor's current velocity
 	void FixedUpdate () {
-		if (isSetup && (semitick++ & 15) == 0) {
+		if (isSetup && (semitick++ & 15) == 0 && myInstructions.getCount() > 0) {
 			Instruction curr = myInstructions.getInstruction (pc++);
 			JointMotor jm = nodes [curr.getNode ()].transform.GetComponent<HingeJoint> ().motor;
 			jm.targetVelocity = curr.getSpeed();

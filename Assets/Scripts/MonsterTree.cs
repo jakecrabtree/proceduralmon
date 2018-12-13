@@ -54,10 +54,11 @@ public class MonsterTree {
 		//Select Node and where to insert in this node from caller's tree
 		int index = Random.Range(0, nodes.Count);
 		MonsterTreeNode selectedNode = nodes[index];
-		int insertionPos = selectedNode.parent;
-		while (insertionPos != selectedNode.parent){
+		int insertionPos;
+		do{
 			insertionPos = Random.Range(0, selectedNode.children.Length);
-		} 
+		}while(insertionPos == selectedNode.parent);
+
 		
 		//Select Node from param's tree
 		int targetIndex = Random.Range(0, tree.nodes.Count);
@@ -149,7 +150,7 @@ public class MonsterTree {
 	}
 	public MonsterTree Breed(MonsterTree tree, out Dictionary<MonsterTreeNode, int> parent1Map, out Dictionary<MonsterTreeNode, int> parent2Map){
 		float type = UnityEngine.Random.Range(0.0f,1.0f);
-		if(type <= Monster.CROSSOVER_CHANCE){
+		if(type <= 0.0f /*TODO: CROSSOVER_CHANCE*/){
 			//Crossover
 			return crossover(tree, out parent1Map, out parent2Map);
 		}
