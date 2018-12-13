@@ -9,6 +9,9 @@ public class InstructionSet {
 	//Represents an instruction set of a monster
 	List<Instruction> instructionSet;
 
+    int numNodes;
+
+   
     public InstructionSet() {
         instructionSet = new List<Instruction>();
     }
@@ -19,11 +22,10 @@ public class InstructionSet {
     
     public InstructionSet(int numNodes) { //a constructor that creates a set of random instructions for numNodes
 		instructionSet = new List<Instruction>();
+        this.numNodes = numNodes;
         int numInstructions = Random.Range (1, numNodes * 20);
         for(int i=0; i<numInstructions; i++) {
-            int node = Random.Range(1, numNodes);
-            int speed = Random.Range(-1000, 1000);
-            instructionSet.Add(new Instruction(node, speed));
+            instructionSet.Add(Instruction.RandomInstruction(1, numNodes));
         }
     }
     
@@ -34,6 +36,10 @@ public class InstructionSet {
     public void setInstruction(int index, Instruction i) {
         instructionSet.Remove(i);
         instructionSet.Insert(index, i);
+    }
+
+    public void removeInstructionAt(int index){
+        instructionSet.RemoveAt(index);
     }
 
     public Instruction getInstruction(int index){
@@ -98,7 +104,26 @@ public class InstructionSet {
 		newInstructionSet.AddRange(otherInstructionSet);
         return new InstructionSet(newInstructionSet);
     }
-    
+
+    public void Mutate(){
+        for(int i = 0; i < getCount(); i++){
+            float rand = Random.Range(0.0f, 1.0f);
+            if (rand <= Monster.PER_NODE_MUTATION_CHANCE){
+                rand = Random.Range(0.0f, 1.0f);
+                Instruction newIns = getInstruction(i);
+                if (rand <= 0.6f){
+                    newIns.setSpeed(newIns.getSpeed() + Random.Range(-1, 1));
+                }else if (rand <= 0.8f){
+                    newIns.setNode(Random.Range(1,numNodes));
+                }else if (rand <= 0.9f){
+                    instructionSet.Insert(i+1, Instruction.RandomInstruction(1, numNodes));
+                }else if (i < getCount() - 1){
+                    instructionSet.RemoveAt(i+1);
+                }            
+            }
+        }
+    }
+
     public void removeNode(int node) {
         for (int i = 0; i < instructionSet.Count; i++){
             Instruction inst = instructionSet[i];

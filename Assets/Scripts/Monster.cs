@@ -14,6 +14,7 @@ public class Monster {
 
 	public static readonly float ASEXUAL_CHANCE = 0.6f;
 	public static readonly float CROSSOVER_CHANCE = 0.5f;
+	public static readonly float PER_NODE_MUTATION_CHANCE = 0.001f;
 
 	public Monster(){
 		SetMonsterTree(new MonsterTree());
@@ -62,13 +63,49 @@ public class Monster {
 	public Monster Breed(Monster other){
 		float rand = Random.Range(0.0f, 1.0f);
 		if (rand <= ASEXUAL_CHANCE){
-			MonsterTree childTree = this.tree.Breed(other.tree);
-			//TODO: remap vertices
-			InstructionSet childSet = this.set.Breed(other.set);
+			Dictionary<MonsterTreeNode, int> parent1Map;
+			Dictionary<MonsterTreeNode, int> parent2Map;
+			MonsterTree childTree = this.tree.Breed(other.tree, out parent1Map, out parent2Map);
+			InstructionSet remappedSet1 = RemapInstructionSet(this, childTree, parent1Map);
+			InstructionSet remappedSet2 = RemapInstructionSet(other, childTree, parent2Map);
+			InstructionSet childSet = remappedSet1.Breed(remappedSet2);
 			return new Monster(childTree, childSet);
 		}else{
 			return Asexual();
 		}
+	}
+
+	static InstructionSet RemapInstructionSet(Monster parent, MonsterTree childTree, Dictionary<MonsterTreeNode, int> parent1Map){
+		InstructionSet ret = parent.set.Asexual();
+		//Get position map of node to position in array
+		Dictionary<MonsterTreeNode, int> childMap = new Dictionary<MonsterTreeNode, int>();
+		for(int i = 0; i < childTree.nodes.Count; ++i){
+			childMap.Add(childTree.nodes[i], i);
+		}
+		//Find map from parent to child tree positions, or -1 if parent didn't pass down this node to child
+		Dictionary<int, int> positionRemap = new Dictionary<int, int>();
+		for(int i = 0; i < parent.tree.NodeCount(); ++i){
+			if (childMap.ContainsKey(parent.tree.nodes[i])){
+				positionRemap.Add(parent1Map[parent.tree.nodes[i]], childMap[parent.tree.nodes[i]]);
+			}
+			else{
+				positionRemap.Add(parent1Map[parent.tree.nodes[i]], -1);
+			}
+		}
+		//Remap instructions based on map
+		for(int i = 0; i < ret.getCount(); ++i){
+			Instruction instruction = ret.getInstruction(i);
+			//Remap if found
+			if(positionRemap[instruction.getNode()] != -1){
+				instruction.setNode(positionRemap[instruction.getNode()]);
+			}
+			else if(instruction.getNode() >= childTree.NodeCount()){
+				//Remove Instruction if now out of bounds
+				ret.removeInstructionAt(i--);
+			}
+			//Do nothing if not found but in bounds
+		}
+		return ret;
 	}
 
 	public Monster Asexual(){
@@ -79,7 +116,7 @@ public class Monster {
 
 	public void Mutate(){
 		tree.Mutate();
-		//TODO: add set.Mutate();
+		set.Mutate();
 	}
 
 	public void GenerateMonster(){
