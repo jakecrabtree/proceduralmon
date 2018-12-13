@@ -22,7 +22,7 @@ public class MonsterTree {
 	private void Randomize(int maxDepth){
 		root = new CubeTreeNode (-1);
 		root.Randomize(maxDepth, maxDepth);
-		nodes = root.CopySubTree ();
+		nodes = root.GetSubTree ();
 	}
 
 	public int NodeCount(){
@@ -325,7 +325,10 @@ public abstract class MonsterTreeNode {
 	}
 
 	public abstract Vector3 randomScale();
-	
+
+	private void getNodesList() {
+
+	}
 
 	private MonsterTreeNode CopySubTreeHelper(List<MonsterTreeNode> nodes, MonsterTreeNode parentNode){
 		MonsterTreeNode copyNode = this.LocalClone();

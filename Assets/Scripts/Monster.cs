@@ -37,6 +37,11 @@ public class Monster {
 		SetInstructions(set);
 	}
 
+	//Deserialization constructor, bool is useless but avoids name conflict
+	private Monster(bool b) {
+
+	}
+
 	public void SetInstructions(InstructionSet set){
 		this.set = set;
 		this.set.monster = this;
@@ -128,11 +133,130 @@ public class Monster {
         tree.generateMonsterAtPosition(pos);
     }
 
-	public void WriteToFile(){
-
+	public void WriteBytes(byte[] bytes, List<byte> toOut) {
+		for (int i = 0; i < bytes.Length; i++) {
+			toOut.Add (bytes [i]);
+		}
 	}
 
-	public void ReadFromFile(){
+	public void GetName(byte[] bytes, ref ulong name1, ref ulong name2) {
+		for (int i = 0; i < 53; i++) {
+			int sh = i % 16;
+			ulong rel = bytes [i * bytes.Length / 53];
+			name1 ^= (rel << (sh * 4));
+		}
+		for (int i = 0; i < 97; i++) {
+			int sh = i % 16;
+			ulong rel = bytes [i * bytes.Length / 97];
+			name2 ^= (rel << (sh * 4));
+		}
+	}
 
+	public string WriteToFile(){
+		ulong name1 = 0;
+		ulong name2 = 0;
+		List<byte> toOut = new List<byte> ();
+		WriteBytes (System.BitConverter.GetBytes(fitness), toOut);
+		WriteBytes (System.BitConverter.GetBytes (set.getCount ()), toOut);
+		for (int i = 0; i < set.getCount (); i++) {
+			Instruction ins = set.getInstruction (i);
+			WriteBytes (System.BitConverter.GetBytes (ins.getNode()), toOut);
+			WriteBytes (System.BitConverter.GetBytes (ins.getSpeed()), toOut); 
+		}
+		WriteBytes (System.BitConverter.GetBytes (tree.nodes.Count), toOut);
+		for (int i = 0; i < tree.nodes.Count; i++) {
+			MonsterTreeNode mtn = tree.nodes [i];
+			WriteBytes (System.BitConverter.GetBytes(mtn.parent), toOut);
+			WriteBytes (System.BitConverter.GetBytes (mtn.scale.x), toOut);
+			WriteBytes (System.BitConverter.GetBytes (mtn.scale.y), toOut);
+			WriteBytes (System.BitConverter.GetBytes (mtn.scale.z), toOut);
+			for (int j = 0; j < 20; j++) {
+				MonsterTreeNode link = mtn.children [j];
+				Debug.Log ("Looking at: " + j);
+				bool isFound = false;
+				if (link == null) {
+					WriteBytes (System.BitConverter.GetBytes (-1), toOut);
+				} else {
+					Debug.Log ("NOT NULL");
+					for (int k = 0; k < tree.nodes.Count; k++) {
+						if (link == tree.nodes [k]) {
+							isFound = true;
+							WriteBytes (System.BitConverter.GetBytes (k), toOut);
+							break;
+						}
+					}
+					if (!isFound) {
+						Debug.Log ("DID NOT FIND!!!");
+					}
+				}
+			}
+		}
+		byte[] bytes = new byte[toOut.Count];
+		for (int i = 0; i < toOut.Count; i++) {
+			bytes [i] = toOut [i];
+		}
+		GetName (bytes, ref name1, ref name2);
+		string name = "Monsters/" + name1 + "-" + name2 + ".mon";
+		System.IO.FileStream f = new System.IO.FileStream (name, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write);
+		f.Write (bytes, 0, bytes.Length);
+		f.Close ();
+		return name;
+	}
+
+	public static Monster ReadFromFile(string filename){
+		System.IO.FileStream f = new System.IO.FileStream (filename, System.IO.FileMode.Open, System.IO.FileAccess.Read);
+		Monster m = new Monster (true);
+		byte[] bytes = new byte[8];
+		f.Read (bytes, 0, 4);
+		m.fitness = System.BitConverter.ToSingle (bytes, 0);
+		f.Read (bytes, 0, 4);
+		int icount = System.BitConverter.ToInt32 (bytes, 0);
+		List<Instruction> il = new List<Instruction> ();
+		for (int i = 0; i < icount; i++) {
+			f.Read (bytes, 0, 4);
+			int n = System.BitConverter.ToInt32 (bytes, 0);
+			f.Read (bytes, 0, 4);
+			float s = System.BitConverter.ToSingle (bytes, 0);
+			il.Add (new Instruction (n, s));
+		}
+		m.set = new InstructionSet (il);
+		f.Read (bytes, 0, 4);
+		int ncount = System.BitConverter.ToInt32 (bytes, 0);
+		List<MonsterTreeNode> mtnl = new List<MonsterTreeNode> ();
+		int[,] links = new int[ncount, 20];
+		for (int i = 0; i < ncount; i++) {
+			CubeTreeNode mtn = new CubeTreeNode ();
+			f.Read (bytes, 0, 4);
+			mtn.parent = System.BitConverter.ToInt32 (bytes, 0);
+			f.Read (bytes, 0, 4);
+			mtn.scale.x = System.BitConverter.ToSingle (bytes, 0);
+			f.Read (bytes, 0, 4);
+			mtn.scale.y = System.BitConverter.ToSingle (bytes, 0);
+			f.Read (bytes, 0, 4);
+			mtn.scale.z = System.BitConverter.ToSingle (bytes, 0);
+			for (int j = 0; j < 20; j++) {
+				f.Read (bytes, 0, 4);
+				links[i, j] = System.BitConverter.ToInt32 (bytes, 0);
+			}
+			mtnl.Add (mtn);
+		}
+		//Now actually link them
+		for (int i = 0; i < ncount; i++) {
+			MonsterTreeNode mtn = mtnl [i];
+			for (int j = 0; j < 20; j++) {
+				if (links[i, j] == -1) {
+					mtn.children [j] = null;
+				} else {
+					mtn.children [j] = mtnl [links [i, j]];
+				}
+			}
+		}
+		MonsterTree mt = new MonsterTree ();
+		mt.nodes = mtnl;
+		mt.root = mtnl [0];
+		mt.monster = m;
+		m.tree = mt;
+		f.Close ();
+		return m;
 	}
 }
