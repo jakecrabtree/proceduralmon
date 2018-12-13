@@ -172,12 +172,10 @@ public class Monster {
 			WriteBytes (System.BitConverter.GetBytes (mtn.scale.z), toOut);
 			for (int j = 0; j < 20; j++) {
 				MonsterTreeNode link = mtn.children [j];
-				Debug.Log ("Looking at: " + j);
 				bool isFound = false;
 				if (link == null) {
-					WriteBytes (System.BitConverter.GetBytes (-1), toOut);
+					WriteBytes (System.BitConverter.GetBytes ((int)-1), toOut);
 				} else {
-					Debug.Log ("NOT NULL");
 					for (int k = 0; k < tree.nodes.Count; k++) {
 						if (link == tree.nodes [k]) {
 							isFound = true;
@@ -187,6 +185,7 @@ public class Monster {
 					}
 					if (!isFound) {
 						Debug.Log ("DID NOT FIND!!!");
+						WriteBytes (System.BitConverter.GetBytes ((int)-1), toOut);
 					}
 				}
 			}
@@ -222,6 +221,7 @@ public class Monster {
 		m.set = new InstructionSet (il);
 		f.Read (bytes, 0, 4);
 		int ncount = System.BitConverter.ToInt32 (bytes, 0);
+		Debug.Log ("NCOUNT: " + ncount);
 		List<MonsterTreeNode> mtnl = new List<MonsterTreeNode> ();
 		int[,] links = new int[ncount, 20];
 		for (int i = 0; i < ncount; i++) {

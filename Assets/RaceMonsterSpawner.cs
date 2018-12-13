@@ -10,7 +10,7 @@ public class RaceMonsterSpawner : MonoBehaviour {
 	// Use this for initialization
 	void Start () {
 		co = coord.GetComponent<Coordinator> ();
-		Monster m = new Monster(3);
+		Monster m = co.getMonster(myID);
 		GameObject o = m.GenerateMonsterAtPosition (transform.position, false);
 		co.creatures [myID] = o;
 		myCreature = o.GetComponent<Creature> ();

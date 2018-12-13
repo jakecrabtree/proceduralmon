@@ -6,14 +6,14 @@ using UnityEngine.SceneManagement;
 public class MonsterLoop : MonoBehaviour {
 
 	public static MonsterLoop instance = null;
-	private static readonly int GENERATION_SIZE = 150; 
+	private static readonly int GENERATION_SIZE = 15/*0*/; 
 	private static readonly int MIN_REPRODUCTION_SIZE = 30; 
 
 	private static readonly int INITIAL_MONSTER_TREE_DEPTH = 3;
 
 	private static readonly float FITNESS_REPRODUCTION_CUTOFF = 15; 
 
-	private static readonly float FITNESS_WRITEOUT_CUTOFF = 50; 
+	private static readonly float FITNESS_WRITEOUT_CUTOFF = 5/*0*/; 
 
 	public static readonly float FITNESS_EVALUATION_TIME = 40; 
 
