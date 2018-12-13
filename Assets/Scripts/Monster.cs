@@ -128,6 +128,10 @@ public class Monster {
 	public void GenerateMonster(){
 		tree.generateMonster();
 	}
+    
+    public void GenerateMonsterAtPosition(Vector3 pos) {
+        tree.generateMonsterAtPosition(pos);
+    }
 
 	public void WriteBytes(byte[] bytes, List<byte> toOut) {
 		for (int i = 0; i < bytes.Length; i++) {
