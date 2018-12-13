@@ -464,7 +464,7 @@ public abstract class MonsterTreeNode {
 		if (parent != -1) {
 			basePos -= getScaledPositionOfChild (parent);
 		}
-		Debug.Log ("POS: " + basePos);
+		//Debug.Log ("POS: " + basePos);
 		o.transform.position = basePos;
 		if (par != null) {
 			//o.transform.SetParent (par.transform);

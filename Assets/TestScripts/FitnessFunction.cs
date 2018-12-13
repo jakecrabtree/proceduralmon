@@ -19,7 +19,6 @@ public class FitnessFunction : MonoBehaviour {
 	void Start () {
         rb = GetComponent<Rigidbody>();
         timeElapsed = 0;
-        StartCoroutine(ScoreVelocity());
 	}
 	
 	// Update is called once per frame
@@ -31,7 +30,7 @@ public class FitnessFunction : MonoBehaviour {
         this.monster = monster;
     }
  
-    IEnumerator ScoreVelocity()
+    public IEnumerator ScoreVelocity()
     {
         startPos = centerOfMass();
         while (timeElapsed < MonsterLoop.FITNESS_EVALUATION_TIME)
@@ -42,7 +41,7 @@ public class FitnessFunction : MonoBehaviour {
             weightedVelocityScore += calculateVelocity(oldPos, newPos, TIME_STEP).magnitude * VelocityWeight();
         }
         endDistance = Vector3.Distance(startPos, centerOfMass());
-        float fitness = (weightedVelocityScore * MonsterLoop.FITNESS_EVALUATION_TIME + endDistance) / 2;
+        float fitness = (weightedVelocityScore * TIME_STEP + endDistance) / 2.0f;
         monster.fitness = fitness;
     }
 
@@ -62,10 +61,10 @@ public class FitnessFunction : MonoBehaviour {
         Vector3 centerOfMassSum = new Vector3();
         foreach (GameObject gO in nodes)
         {
-            centerOfMassSum += gO.GetComponent<Rigidbody>().centerOfMass;
+            centerOfMassSum += gO.GetComponent<Rigidbody>().centerOfMass + gO.transform.position;
         }
         centerOfMassSum.y = 0;
-        return centerOfMassSum / nodes.Count;
+        return centerOfMassSum / (float)nodes.Count;
     }
 
     float VelocityWeight()

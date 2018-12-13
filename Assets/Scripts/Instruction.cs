@@ -37,7 +37,8 @@ public class Instruction {
         return new Instruction(jointNumber, speed);
     }
 
-    public static Instruction RandomInstruction(int minNode, int maxNode, float minSpeed = -1000, float maxSpeed = 1000){
-        return new Instruction(Random.Range(minNode, maxNode), Random.Range(minSpeed, maxSpeed));
+    public static Instruction RandomInstruction(int minNode, int maxNode, float minSpeed = 100, float maxSpeed = 150){
+        int sign = Random.value < .5? 1 : -1;
+        return new Instruction(Random.Range(minNode, maxNode), sign*Random.Range(minSpeed, maxSpeed));
     }
 }
