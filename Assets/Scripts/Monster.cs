@@ -196,7 +196,7 @@ public class Monster {
 			bytes [i] = toOut [i];
 		}
 		GetName (bytes, ref name1, ref name2);
-		string name = "Monsters/" + name1 + "-" + name2 + ".mon";
+		string name = "Monsters/" + Mathf.RoundToInt(fitness) + "-" + name1 + "-" + name2 + ".mon";
 		System.IO.FileStream f = new System.IO.FileStream (name, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write);
 		f.Write (bytes, 0, bytes.Length);
 		f.Close ();

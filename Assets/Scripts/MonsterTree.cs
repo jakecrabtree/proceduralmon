@@ -146,14 +146,20 @@ public class MonsterTree {
 		return this.clone();
 	}
 	public MonsterTree Breed(MonsterTree tree, out Dictionary<MonsterTreeNode, int> parent1Map, out Dictionary<MonsterTreeNode, int> parent2Map){
-		float type = UnityEngine.Random.Range(0.0f,1.0f);
-		if(type <= Monster.CROSSOVER_CHANCE){
-			//Crossover
-			return crossover(tree, out parent1Map, out parent2Map);
-		}
-		else{
-			//Grafting
-			return graft(tree, out parent1Map, out parent2Map);
+		while(true) {
+			try{
+				float type = UnityEngine.Random.Range(0.0f,1.0f);
+				if(type <= Monster.CROSSOVER_CHANCE){
+					//Crossover
+					return crossover(tree, out parent1Map, out parent2Map);
+				}
+				else{
+					//Grafting
+					return graft(tree, out parent1Map, out parent2Map);
+				}
+			} catch {
+				Debug.Log ("Bad Tree: Ignoring");
+			}
 		}
 	}
 
