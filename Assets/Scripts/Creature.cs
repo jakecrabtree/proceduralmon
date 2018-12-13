@@ -9,6 +9,8 @@ public class Creature : MonoBehaviour {
 	InstructionSet myInstructions;
 	int pc = 0;
 	long semitick = 0;
+	public int myID = 0;
+	public Coordinator co = null;
 	public void nodeSetup(List<GameObject> n) {
 		nodes = n;
 		myInstructions = new InstructionSet (n.Count);
@@ -41,6 +43,13 @@ public class Creature : MonoBehaviour {
 
     // Gets instruction and set's the JointMotor's current velocity
 	void FixedUpdate () {
+		if (co != null) {
+			Vector3 com = nodes [0].transform.position;
+			com.y = 0;
+			if (com.magnitude > 120) {
+				co.setOver (myID);
+			}
+		}
 		if (isSetup && shouldWalk && (semitick++ & 15) == 0 && myInstructions.getCount() > 0) {
 			Instruction curr = myInstructions.getInstruction (pc++);
 			JointMotor jm = nodes [curr.getNode ()].transform.GetComponent<HingeJoint> ().motor;

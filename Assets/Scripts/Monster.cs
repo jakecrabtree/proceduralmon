@@ -129,8 +129,8 @@ public class Monster {
 		return tree.generateMonster();
 	}
     
-    public void GenerateMonsterAtPosition(Vector3 pos) {
-        tree.generateMonsterAtPosition(pos);
+	public GameObject GenerateMonsterAtPosition(Vector3 pos, bool shouldWalk = true) {
+		return tree.generateMonsterAtPosition(pos, shouldWalk);
     }
 
 	public void WriteBytes(byte[] bytes, List<byte> toOut) {
