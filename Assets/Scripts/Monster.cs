@@ -73,7 +73,7 @@ public class Monster {
 			MonsterTree childTree = this.tree.Breed(other.tree, out parent1Map, out parent2Map);
 			InstructionSet remappedSet1 = RemapInstructionSet(this, childTree, parent1Map);
 			InstructionSet remappedSet2 = RemapInstructionSet(other, childTree, parent2Map);
-			InstructionSet childSet = remappedSet1.Asexual();//.Breed(remappedSet2);
+			InstructionSet childSet = remappedSet1.Breed(remappedSet2);
 			return new Monster(childTree, childSet);
 		}else{
 			return Asexual();

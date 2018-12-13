@@ -6,18 +6,18 @@ using UnityEngine.SceneManagement;
 public class MonsterLoop : MonoBehaviour {
 
 	public static MonsterLoop instance = null;
-	private static readonly int GENERATION_SIZE = 200; 
-	private static readonly int MIN_REPRODUCTION_SIZE = 40; 
+	private static readonly int GENERATION_SIZE = 150; 
+	private static readonly int MIN_REPRODUCTION_SIZE = 30; 
 
 	private static readonly int INITIAL_MONSTER_TREE_DEPTH = 3;
 
-	private static readonly float FITNESS_REPRODUCTION_CUTOFF = 12; 
+	private static readonly float FITNESS_REPRODUCTION_CUTOFF = 15; 
 
 	private static readonly float FITNESS_WRITEOUT_CUTOFF = 50; 
 
-	public static readonly float FITNESS_EVALUATION_TIME = 20; 
+	public static readonly float FITNESS_EVALUATION_TIME = 40; 
 
-	public static readonly float FITNESS_EVALUATION_TIME_SCALE = 8f;
+	public static readonly float FITNESS_EVALUATION_TIME_SCALE = 10f;
 
 
 	private List<Monster> generation;
@@ -53,7 +53,7 @@ public class MonsterLoop : MonoBehaviour {
 		Debug.Log("New Generation");
 		reproduce = new List<Monster>();
 		totalFitness = 0;
-		 for (; currentMonster < generation.Count; ++currentMonster){
+		for (; currentMonster < GENERATION_SIZE; ++currentMonster){
 			currentObject = generation[currentMonster].GenerateMonster();
 			yield return StartCoroutine(currentObject.GetComponent<FitnessFunction>().ScoreVelocity());
 			float fitness = generation[currentMonster].fitness;
