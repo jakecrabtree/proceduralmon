@@ -4,6 +4,7 @@ using UnityEngine;
 
 public class Creature : MonoBehaviour {
 	bool isSetup = false;
+    bool shouldWalk = true;
 	List<GameObject> nodes = null;
 	InstructionSet myInstructions;
 	int pc = 0;
@@ -19,6 +20,9 @@ public class Creature : MonoBehaviour {
 		myInstructions = set;
 		isSetup = true;
 	}
+    public void setShouldWalk(bool s) {
+        shouldWalk = s;
+    }
 	// Use this for initialization
 	void Start () {
 
@@ -31,7 +35,7 @@ public class Creature : MonoBehaviour {
 
     // Gets instruction and set's the JointMotor's current velocity
 	void FixedUpdate () {
-		if (isSetup && (semitick++ & 15) == 0 && myInstructions.getCount() > 0) {
+		if (isSetup && shouldWalk && (semitick++ & 15) == 0 && myInstructions.getCount() > 0) {
 			Instruction curr = myInstructions.getInstruction (pc++);
 			JointMotor jm = nodes [curr.getNode ()].transform.GetComponent<HingeJoint> ().motor;
 			jm.targetVelocity = curr.getSpeed();

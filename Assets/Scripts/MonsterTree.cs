@@ -276,6 +276,7 @@ public class MonsterTree {
 		GameObject o = root.generateMonster (pos, 0, null, monsterMat, new Color(Random.Range(.5f, .8f), Random.Range(.5f, .8f), Random.Range(.5f, .8f)), goList);
 		Creature cr = o.AddComponent<Creature> ();
 		cr.nodeSetup(goList, monster.GetInstructions());
+        cr.setShouldWalk(false);
 		if (eye != null) {
 			float eyeSmall = .3f;
 			float eyeLarge = .5f;
