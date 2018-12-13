@@ -11,7 +11,7 @@ public class MonsterLoop : MonoBehaviour {
 
 	private static readonly int INITIAL_MONSTER_TREE_DEPTH = 3;
 
-	private static readonly float FITNESS_REPRODUCTION_CUTOFF = 30; 
+	private static readonly float FITNESS_REPRODUCTION_CUTOFF = 40; 
 
 	private static readonly float FITNESS_WRITEOUT_CUTOFF = 80; 
 
