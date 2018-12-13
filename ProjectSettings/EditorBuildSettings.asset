@@ -6,6 +6,6 @@ EditorBuildSettings:
   serializedVersion: 2
   m_Scenes:
   - enabled: 1
-    path: Assets/Scenes/SimulationScene.unity
-    guid: fff3b4453b62841178ca0603b7cc9e2b
+    path: Assets/Scenes/Racing2.unity
+    guid: 914d60bcb88a785419d41ee4d97cc67c
   m_configObjects: {}
