@@ -77,10 +77,12 @@ public class Monster {
 
 	static InstructionSet RemapInstructionSet(Monster parent, MonsterTree childTree, Dictionary<MonsterTreeNode, int> parent1Map){
 		InstructionSet ret = parent.set.Asexual();
+		//Get position map of node to position in array
 		Dictionary<MonsterTreeNode, int> childMap = new Dictionary<MonsterTreeNode, int>();
 		for(int i = 0; i < childTree.nodes.Count; ++i){
 			childMap.Add(childTree.nodes[i], i);
 		}
+		//Find map from parent to child tree positions, or -1 if parent didn't pass down this node to child
 		Dictionary<int, int> positionRemap = new Dictionary<int, int>();
 		for(int i = 0; i < parent.tree.NodeCount(); ++i){
 			if (childMap.ContainsKey(parent.tree.nodes[i])){
@@ -90,14 +92,18 @@ public class Monster {
 				positionRemap.Add(parent1Map[parent.tree.nodes[i]], -1);
 			}
 		}
+		//Remap instructions based on map
 		for(int i = 0; i < ret.getCount(); ++i){
 			Instruction instruction = ret.getInstruction(i);
+			//Remap if found
 			if(positionRemap[instruction.getNode()] != -1){
 				instruction.setNode(positionRemap[instruction.getNode()]);
 			}
-			else{
+			else if(instruction.getNode() >= childTree.NodeCount()){
+				//Remove Instruction if now out of bounds
 				ret.removeInstructionAt(i--);
 			}
+			//Do nothing if not found but in bounds
 		}
 		return ret;
 	}
