@@ -9,27 +9,22 @@ public class FitnessFunction : MonoBehaviour {
     //public Transform creature;
     Monster monster;
     public Rigidbody rb;
-    public float time;
-    public float distanceTravelled;
+    public float timeElapsed;
     public float endDistance = 0;
     public float weightedVelocityScore = 0;
     private static readonly float TIME_STEP = 0.2f;    
-
     Vector3 oldPos, newPos, startPos;
 
 	// Use this for initialization
 	void Start () {
         rb = GetComponent<Rigidbody>();
-        time = 0;
+        timeElapsed = 0;
         StartCoroutine(ScoreVelocity());
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        time += Time.deltaTime;
-        if(time >= MonsterLoop.FITNESS_EVALUATION_TIME) {
-            //end simulation, compare to other creatures
-        }
+        timeElapsed += Time.deltaTime;
 	}
 
     public void AssignMonster(Monster monster){
@@ -39,7 +34,7 @@ public class FitnessFunction : MonoBehaviour {
     IEnumerator ScoreVelocity()
     {
         startPos = centerOfMass();
-        while (time < MonsterLoop.FITNESS_EVALUATION_TIME)
+        while (timeElapsed < MonsterLoop.FITNESS_EVALUATION_TIME)
         {
             oldPos = centerOfMass();
             yield return new WaitForSeconds(TIME_STEP);
@@ -75,7 +70,7 @@ public class FitnessFunction : MonoBehaviour {
 
     float VelocityWeight()
     {
-        return time / MonsterLoop.FITNESS_EVALUATION_TIME;
+        return timeElapsed / MonsterLoop.FITNESS_EVALUATION_TIME;
     }
 
     Vector3 calculateVelocity(Vector3 oldPos, Vector3 newPos, float deltaTime)
