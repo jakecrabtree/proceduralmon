@@ -5,7 +5,7 @@ using UnityEngine;
 public class MonsterTree {
 	//TODO: Make private
 	public MonsterTreeNode root;
-	List<MonsterTreeNode> nodes;
+	public List<MonsterTreeNode> nodes;
 
 	//The Monster this monster tree belongs to
 	public Monster monster;
@@ -50,7 +50,7 @@ public class MonsterTree {
 		return newTree;
 	}
 
-	private MonsterTree graft(MonsterTree tree){
+	private MonsterTree graft(MonsterTree tree, out Dictionary<MonsterTreeNode, int> parent1Map, out Dictionary<MonsterTreeNode, int> parent2Map){
 		//Select Node and where to insert in this node from caller's tree
 		int index = Random.Range(0, nodes.Count);
 		MonsterTreeNode selectedNode = nodes[index];
@@ -65,7 +65,22 @@ public class MonsterTree {
 
 		//Copy Caller's Tree and target's subtree
 		MonsterTree res = this.clone();
+		parent1Map = new Dictionary<MonsterTreeNode, int>();
+		for (int i = 0; i < res.nodes.Count; ++i){
+			parent1Map.Add(res.nodes[i], i);
+		}
+		parent2Map = new Dictionary<MonsterTreeNode, int>();
+		Dictionary<MonsterTreeNode, int> tempMap = new Dictionary<MonsterTreeNode, int>();
+		for (int i = 0; i < tree.nodes.Count; ++i){
+			tempMap.Add(tree.nodes[i],i);
+		}
+		List<MonsterTreeNode> subtree = targetNode.GetSubTree();
 		List<MonsterTreeNode> newNodes = targetNode.CopySubTree();
+		for (int i = 0; i < subtree.Count; ++i){
+			if (tempMap.ContainsKey(subtree[i])){
+				parent2Map.Add(newNodes[i], tempMap[subtree[i]]);
+			}
+		}
 
 		//Insert into Caller and add target's nodes to caller's list
 		res.nodes[index].children[insertionPos] = newNodes[0];
@@ -75,16 +90,16 @@ public class MonsterTree {
 	private static int min(int a, int b){
 		return a < b ? a : b;
 	}
-	private MonsterTree crossover(MonsterTree tree){
+	private MonsterTree crossover(MonsterTree tree, out Dictionary<MonsterTreeNode, int> parent1Map, out Dictionary<MonsterTreeNode, int> parent2Map){
 		MonsterTree parent1 = this.clone();
 		MonsterTree parent2 = tree.clone();
 		//Get positions of all the caller's nodes
-		Dictionary<MonsterTreeNode, int> parent1Map = new Dictionary<MonsterTreeNode, int>();
+		parent1Map = new Dictionary<MonsterTreeNode, int>();
 		for (int i = 0; i < parent1.nodes.Count; ++i){
 			parent1Map.Add(parent1.nodes[i], i);
 		}
 		//Get positions of all the param's nodes
-		Dictionary<MonsterTreeNode, int> parent2Map = new Dictionary<MonsterTreeNode, int>();
+		parent2Map = new Dictionary<MonsterTreeNode, int>();
 		for (int i = 0; i < parent2.nodes.Count; ++i){
 			parent2Map.Add(parent2.nodes[i], i);
 		}
@@ -132,15 +147,15 @@ public class MonsterTree {
 	public MonsterTree Asexual(){
 		return this.clone();
 	}
-	public MonsterTree Breed(MonsterTree tree){
+	public MonsterTree Breed(MonsterTree tree, out Dictionary<MonsterTreeNode, int> parent1Map, out Dictionary<MonsterTreeNode, int> parent2Map){
 		float type = UnityEngine.Random.Range(0.0f,1.0f);
 		if(type <= Monster.CROSSOVER_CHANCE){
 			//Crossover
-			return crossover(tree);
+			return crossover(tree, out parent1Map, out parent2Map);
 		}
 		else{
 			//Grafting
-			return graft(tree);
+			return graft(tree, out parent1Map, out parent2Map);
 		}
 	}
 
@@ -260,9 +275,19 @@ public abstract class MonsterTreeNode {
 	//public GameObject obj;
 	public int parent;
 	public Vector3 scale;
+
+	//public ulong id;
 	public abstract Vector3 getPositionOfChild(int child);
 	public abstract MonsterTreeNode createEmptyClone();
 
+	//protected static ulong currentID = 0;
+/* 
+	public static bool operator==(MonsterTreeNode lhs, MonsterTreeNode rhs){
+		return lhs.id == rhs.id;
+	}
+	public static bool operator!=(MonsterTreeNode lhs, MonsterTreeNode rhs){
+		return !(lhs == rhs);
+	}*/
 
 	//Does NOT clone children, only local data to the node
 	public MonsterTreeNode LocalClone(){
@@ -296,6 +321,27 @@ public abstract class MonsterTreeNode {
 	public List<MonsterTreeNode> CopySubTree(){
 		List<MonsterTreeNode> ret = new List<MonsterTreeNode>();
 		this.CopySubTreeHelper(ret, null);
+		return ret;
+	}
+
+	private MonsterTreeNode GetSubTreeHelper(List<MonsterTreeNode> nodes, MonsterTreeNode parentNode){
+		MonsterTreeNode copyNode = this;
+		nodes.Add(copyNode);
+		for (int i = 0; i < children.Length; ++i){
+			if (children[i] == null) continue;
+			if (i == parent){ 
+				copyNode.children[i] = parentNode;
+			}
+			else{
+				copyNode.children[i] = children[i].GetSubTreeHelper(nodes, this);
+			}
+		}
+		return copyNode;
+	}
+	//returned list is in pre-order traversal order!
+	public List<MonsterTreeNode> GetSubTree(){
+		List<MonsterTreeNode> ret = new List<MonsterTreeNode>();
+		this.GetSubTreeHelper(ret, null);
 		return ret;
 	}
 	public bool checkForSelfIntersect(HashSet<long> ha, float basex, float basey, float basez) {
@@ -471,6 +517,7 @@ public class CubeTreeNode : MonsterTreeNode {
 		parent = p;
 		children = new MonsterTreeNode[20];
 		scale = randomScale();
+		//id = MonsterTreeNode.currentID++;
 		//TODO: obj = makecube
 	}
 

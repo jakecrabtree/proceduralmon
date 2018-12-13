@@ -38,6 +38,10 @@ public class InstructionSet {
         instructionSet.Insert(index, i);
     }
 
+    public void removeInstructionAt(int index){
+        instructionSet.RemoveAt(index);
+    }
+
     public Instruction getInstruction(int index){
         return instructionSet[index];
     }

@@ -84,6 +84,7 @@ public class MonsterLoop : MonoBehaviour {
 	}
 
 	void RunEvaluation(Monster monster){
+		//Load empty eval scene
 		monster.GenerateMonster();
 		//Let it go until time cutoff
 		//Evaluate
