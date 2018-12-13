@@ -3,7 +3,6 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class MonsterTree {
-	//TODO: Make private
 	public MonsterTreeNode root;
 	public List<MonsterTreeNode> nodes;
 
@@ -249,7 +248,7 @@ public class MonsterTree {
 	}
 	public GameObject generateMonster() {
 		List<GameObject> goList = new List<GameObject> ();
-		GameObject o = root.generateMonster (new Vector3(0, 40, 0), 0, null, monsterMat, new Color(Random.Range(.5f, .8f), Random.Range(.5f, .8f), Random.Range(.5f, .8f)), goList);
+		GameObject o = root.generateMonster (new Vector3(0, 20, 0), 0, null, monsterMat, new Color(Random.Range(.5f, .8f), Random.Range(.5f, .8f), Random.Range(.5f, .8f)), goList);
 		Creature cr = o.AddComponent<Creature> ();
 		cr.nodeSetup(goList, monster.GetInstructions());
 		if (eye != null) {
@@ -298,18 +297,8 @@ public abstract class MonsterTreeNode {
 	public int parent;
 	public Vector3 scale;
 
-	//public ulong id;
 	public abstract Vector3 getPositionOfChild(int child);
 	public abstract MonsterTreeNode createEmptyClone();
-
-	//protected static ulong currentID = 0;
-/* 
-	public static bool operator==(MonsterTreeNode lhs, MonsterTreeNode rhs){
-		return lhs.id == rhs.id;
-	}
-	public static bool operator!=(MonsterTreeNode lhs, MonsterTreeNode rhs){
-		return !(lhs == rhs);
-	}*/
 
 	//Does NOT clone children, only local data to the node
 	public MonsterTreeNode LocalClone(){
@@ -542,8 +531,6 @@ public class CubeTreeNode : MonsterTreeNode {
 		parent = p;
 		children = new MonsterTreeNode[20];
 		scale = randomScale();
-		//id = MonsterTreeNode.currentID++;
-		//TODO: obj = makecube
 	}
 
 	public override Vector3 randomScale(){

@@ -12,7 +12,7 @@ public class Monster {
 	//Fitness value
 	public float fitness = 0;
 
-	public static readonly float SEEXUAL_REPRO_CHANCE = 0.4f;
+	public static readonly float SEXUAL_REPRO_CHANCE = 0.4f;
 	public static readonly float CROSSOVER_CHANCE = 0.5f;
 	public static readonly float PER_NODE_MUTATION_CHANCE = 0.001f;
 
@@ -67,7 +67,7 @@ public class Monster {
 
 	public Monster Breed(Monster other){
 		float rand = Random.Range(0.0f, 1.0f);
-		if (rand <= 1.0f/* TODO: return to sexual repro chance*/){
+		if (rand <= SEXUAL_REPRO_CHANCE){
 			Dictionary<MonsterTreeNode, int> parent1Map;
 			Dictionary<MonsterTreeNode, int> parent2Map;
 			MonsterTree childTree = this.tree.Breed(other.tree, out parent1Map, out parent2Map);
