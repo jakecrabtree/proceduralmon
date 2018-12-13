@@ -6,24 +6,26 @@ using UnityEngine.SceneManagement;
 public class MonsterLoop : MonoBehaviour {
 
 	public static MonsterLoop instance = null;
-	private static readonly int GENERATION_SIZE = 2; 
+	private static readonly int GENERATION_SIZE = 150; 
+	private static readonly int MIN_REPRODUCTION_SIZE = 30; 
+
 	private static readonly int INITIAL_MONSTER_TREE_DEPTH = 3;
 
-	private static readonly int MIN_REPRODUCTION_POOL_SIZE = 2;
+	private static readonly float FITNESS_REPRODUCTION_CUTOFF = 15; 
 
-	private static readonly float FITNESS_REPRODUCTION_CUTOFF = 100; //TODO: Change me
+	private static readonly float FITNESS_WRITEOUT_CUTOFF = 50; 
 
-	private static readonly float FITNESS_WRITEOUT_CUTOFF = 200; //TODO: Change me
+	public static readonly float FITNESS_EVALUATION_TIME = 40; 
 
-	public static readonly float FITNESS_EVALUATION_TIME = 5; // Seconds TODO: Change me
-
-	public static readonly float FITNESS_EVALUATION_TIME_SCALE = 1.5f;
+	public static readonly float FITNESS_EVALUATION_TIME_SCALE = 10f;
 
 
 	private List<Monster> generation;
 	private List<Monster> reproduce;
 	int currentMonster;
 	GameObject currentObject;
+
+	float totalFitness = 0;
 
 	void Awake(){
 		if (instance == null){
@@ -48,11 +50,16 @@ public class MonsterLoop : MonoBehaviour {
 	}
 
 	IEnumerator RunGeneration(){
-		for (; currentMonster < generation.Count; ++currentMonster){
+		Debug.Log("New Generation");
+		reproduce = new List<Monster>();
+		totalFitness = 0;
+		for (; currentMonster < GENERATION_SIZE; ++currentMonster){
 			currentObject = generation[currentMonster].GenerateMonster();
-			yield return new WaitForSeconds(FITNESS_EVALUATION_TIME);
+			yield return StartCoroutine(currentObject.GetComponent<FitnessFunction>().ScoreVelocity());
 			float fitness = generation[currentMonster].fitness;
+			Debug.Log(fitness);
 			if (fitness >= FITNESS_REPRODUCTION_CUTOFF){
+				totalFitness += fitness;
 				reproduce.Add(generation[currentMonster]);
 			}
 			if (fitness >= FITNESS_WRITEOUT_CUTOFF){
@@ -64,21 +71,38 @@ public class MonsterLoop : MonoBehaviour {
 		MutateNewGeneration();
 		currentMonster = 0;
 		StartCoroutine(RunGeneration());
+		yield break;
 	}
 
+	Monster SelectParent(){
+		float rand = Random.Range(0, totalFitness);
+		float total = 0;
+		foreach(Monster parent in reproduce){
+			if (rand >= total && rand < total+parent.fitness){
+				return parent;
+			}
+			total+=parent.fitness;
+		}
+		return null;
+	}
 	void Reproduce(){
-		if (reproduce.Count < MIN_REPRODUCTION_POOL_SIZE){
-			InitializeGeneration();
+		generation.Clear();
+		if (reproduce.Count < MIN_REPRODUCTION_SIZE){
+			foreach(Monster monster in reproduce){
+				generation.Add(monster);
+			}
+			while (generation.Count < GENERATION_SIZE){
+				generation.Add(new Monster(INITIAL_MONSTER_TREE_DEPTH));
+			}
 			return;
 		}
-		generation.Clear();
 		for(int i = 0; i < GENERATION_SIZE; ++i){
 			Monster parent1 = null;
 			Monster parent2 = null;
 			do{
-				parent1 = reproduce[Random.Range(0, reproduce.Count)];
-				parent2 = reproduce[Random.Range(0, reproduce.Count)];
-			}while(parent1 == parent2);
+				parent1 = SelectParent();
+				parent2 = SelectParent();
+			}while(parent1 == parent2 || parent1 == null || parent2 == null);
 			Monster child = parent1.Breed(parent2);
 			generation.Add(child);
 		}
@@ -86,18 +110,8 @@ public class MonsterLoop : MonoBehaviour {
 	}
 
 	void MutateNewGeneration(){
-		foreach(Monster monster in generation){
-			monster.Mutate();
-		}
-	}
-
-	// Use this for initialization
-	void Start () {
-		
-	}
-	
-	// Update is called once per frame
-	void Update () {
-		
+		//foreach(Monster monster in generation){
+	//		monster.Mutate();
+	//	}
 	}
 }

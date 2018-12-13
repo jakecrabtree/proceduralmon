@@ -111,7 +111,7 @@ public class InstructionSet {
             if (rand <= Monster.PER_NODE_MUTATION_CHANCE){
                 rand = Random.Range(0.0f, 1.0f);
                 Instruction newIns = getInstruction(i);
-                if (rand <= 0.6f){
+                if (rand <= 0.4f){
                     newIns.setSpeed(newIns.getSpeed() + Random.Range(-1, 1));
                 }else if (rand <= 0.8f){
                     newIns.setNode(Random.Range(1,numNodes));
