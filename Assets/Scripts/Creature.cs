@@ -4,7 +4,7 @@ using UnityEngine;
 
 public class Creature : MonoBehaviour {
 	bool isSetup = false;
-    bool shouldWalk = true;
+    bool shouldWalk = false;
 	List<GameObject> nodes = null;
 	InstructionSet myInstructions;
 	int pc = 0;
@@ -50,7 +50,7 @@ public class Creature : MonoBehaviour {
 				co.setOver (myID);
 			}
 		}
-		if (isSetup && shouldWalk && (semitick++ & 15) == 0 && myInstructions.getCount() > 0) {
+		if (isSetup && shouldWalk && (semitick++ & 15) == 0 && myInstructions.getCount() > 0 && co.hasSelected) {
 			Instruction curr = myInstructions.getInstruction (pc++);
 			if(curr.getNode() < nodes.Count){
 				JointMotor jm = nodes [curr.getNode ()].transform.GetComponent<HingeJoint> ().motor;
