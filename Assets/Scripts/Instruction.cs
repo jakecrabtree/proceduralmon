@@ -9,6 +9,7 @@ public class Instruction {
     
     //instruction[0] = the joint number
     //instruction[1] = speed
+
     
     public Instruction(int num, float sp) {
         jointNumber = num;
@@ -34,5 +35,9 @@ public class Instruction {
     //Returns a deep copy of an instruction
     public Instruction copy(){
         return new Instruction(jointNumber, speed);
+    }
+
+    public static Instruction RandomInstruction(int minNode, int maxNode, float minSpeed = -1000, float maxSpeed = 1000){
+        return new Instruction(Random.Range(minNode, maxNode), Random.Range(minSpeed, maxSpeed));
     }
 }

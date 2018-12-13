@@ -14,6 +14,7 @@ public class Monster {
 
 	public static readonly float ASEXUAL_CHANCE = 0.6f;
 	public static readonly float CROSSOVER_CHANCE = 0.5f;
+	public static readonly float PER_NODE_MUTATION_CHANCE = 0.001f;
 
 	public Monster(){
 		SetMonsterTree(new MonsterTree());
@@ -79,7 +80,7 @@ public class Monster {
 
 	public void Mutate(){
 		tree.Mutate();
-		//TODO: add set.Mutate();
+		set.Mutate();
 	}
 
 	public void GenerateMonster(){
