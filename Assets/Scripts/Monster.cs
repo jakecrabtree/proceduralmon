@@ -205,6 +205,7 @@ public class Monster {
 	public static Monster ReadFromFile(string filename){
 		System.IO.FileStream f = new System.IO.FileStream (filename, System.IO.FileMode.Open, System.IO.FileAccess.Read);
 		Monster m = new Monster (true);
+		try{
 		byte[] bytes = new byte[8];
 		f.Read (bytes, 0, 4);
 		m.fitness = System.BitConverter.ToSingle (bytes, 0);
@@ -256,6 +257,7 @@ public class Monster {
 		mt.root = mtnl [0];
 		mt.monster = m;
 		m.tree = mt;
+		}catch{ m = null;}
 		f.Close ();
 		return m;
 	}

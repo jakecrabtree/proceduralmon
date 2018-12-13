@@ -24,12 +24,14 @@ public class Coordinator : MonoBehaviour {
 	}
 
 	public Monster getMonster(int id) {
+		Debug.Log (":?");
+		//return new Monster (3);
 		int attempts = 0;
 		if (!hasMonsters) {
 			string[] f = System.IO.Directory.GetFiles ("Monsters", "*.mon");
 			int[] ids = new int[6];
 			for(int i = 0; i < 6; i++) {
-				while (attempts < 30) {
+				while (attempts < 300) {
 					attempts++;
 					int fid = Random.Range (0, f.Length);
 					bool isGood = true;
@@ -42,10 +44,8 @@ public class Coordinator : MonoBehaviour {
 					if (isGood) {
 						ids [i] = fid;
 						bool hasMonster = true;
-						try{
-							return monsters[id];
-							monsters [i] = Monster.ReadFromFile (f [fid]);
-						} catch {
+						monsters [i] = Monster.ReadFromFile (f [fid]);
+						if(monsters[i] == null) {
 							hasMonster = false;
 							Debug.Log ("Caught bad file");
 							int count = 0;
@@ -72,6 +72,7 @@ public class Coordinator : MonoBehaviour {
 			hasMonsters = true;
 		}
 		Debug.Log (attempts);
+		Debug.Log (monsters [id]);
 		return monsters [id];
 	}
 
