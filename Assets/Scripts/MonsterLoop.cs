@@ -53,7 +53,7 @@ public class MonsterLoop : MonoBehaviour {
 		Debug.Log("New Generation");
 		reproduce = new List<Monster>();
 		totalFitness = 0;
-		 for (; currentMonster < 10; ++currentMonster){
+		 for (; currentMonster < generation.Count; ++currentMonster){
 			currentObject = generation[currentMonster].GenerateMonster();
 			yield return StartCoroutine(currentObject.GetComponent<FitnessFunction>().ScoreVelocity());
 			float fitness = generation[currentMonster].fitness;
