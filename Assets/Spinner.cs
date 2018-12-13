@@ -35,6 +35,7 @@ public class Spinner : MonoBehaviour {
 			camera.transform.position = holder.transform.position;
 			camera.transform.LookAt (transform);
 			camera.transform.SetParent (holder.transform);
+			co.hasSelected = true;
 			MP1.GetComponent<RaceMonsterSpawner> ().myCreature.setShouldWalk (true);
 			MP2.GetComponent<RaceMonsterSpawner> ().myCreature.setShouldWalk (true);
 			MP3.GetComponent<RaceMonsterSpawner> ().myCreature.setShouldWalk (true);
