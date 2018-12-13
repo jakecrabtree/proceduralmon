@@ -13,7 +13,7 @@ public class MonsterLoop : MonoBehaviour {
 
 	private static readonly float FITNESS_REPRODUCTION_CUTOFF = 17; 
 
-	private static readonly float FITNESS_WRITEOUT_CUTOFF = 45; 
+	private static readonly float FITNESS_WRITEOUT_CUTOFF = 55; 
 
 	public static readonly float FITNESS_EVALUATION_TIME = 40; 
 
