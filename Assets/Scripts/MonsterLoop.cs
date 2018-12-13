@@ -10,7 +10,9 @@ public class MonsterLoop : MonoBehaviour {
 
 	private static readonly float FITNESS_REPRODUCTION_CUTOFF = 100; //TODO: Change me
 
-	private static readonly float FITNESS_WRITEOUT_CUTOFF = 100; //TODO: Change me
+	private static readonly float FITNESS_WRITEOUT_CUTOFF = 200; //TODO: Change me
+
+	private static readonly float FITNESS_EVALUATION_TIME = 3; // Seconds TODO: Change me
 
 
 	private List<Monster> generation;
@@ -36,8 +38,14 @@ public class MonsterLoop : MonoBehaviour {
 		currentMonster = 0;
 	}
 
-	void RunIteration(){
-		//generation[currentMonster].
+	void RunGeneration(){
+
+	}
+
+	void RunEvaluation(Monster monster){
+		monster.GenerateMonster();
+		//Let it go until time cutoff
+		//Evaluate
 	}
 
 	// Use this for initialization
