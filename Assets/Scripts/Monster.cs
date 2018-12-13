@@ -125,8 +125,8 @@ public class Monster {
 		set.Mutate();
 	}
 
-	public void GenerateMonster(){
-		tree.generateMonster();
+	public GameObject GenerateMonster(){
+		return tree.generateMonster();
 	}
     
     public void GenerateMonsterAtPosition(Vector3 pos) {

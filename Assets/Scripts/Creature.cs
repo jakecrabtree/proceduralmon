@@ -33,6 +33,12 @@ public class Creature : MonoBehaviour {
 		
 	}
 
+	public void DestroyCreature(){
+		foreach(GameObject node in nodes){
+			Destroy(node);
+		}
+	}
+
     // Gets instruction and set's the JointMotor's current velocity
 	void FixedUpdate () {
 		if (isSetup && shouldWalk && (semitick++ & 15) == 0 && myInstructions.getCount() > 0) {

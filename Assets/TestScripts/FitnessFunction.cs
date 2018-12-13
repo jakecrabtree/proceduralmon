@@ -22,7 +22,6 @@ public class FitnessFunction : MonoBehaviour {
         rb = GetComponent<Rigidbody>();
         time = 0;
         StartCoroutine(ScoreVelocity());
-        //
 	}
 	
 	// Update is called once per frame
