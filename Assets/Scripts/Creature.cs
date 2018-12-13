@@ -43,9 +43,13 @@ public class Creature : MonoBehaviour {
 	void FixedUpdate () {
 		if (isSetup && shouldWalk && (semitick++ & 15) == 0 && myInstructions.getCount() > 0) {
 			Instruction curr = myInstructions.getInstruction (pc++);
-			JointMotor jm = nodes [curr.getNode ()].transform.GetComponent<HingeJoint> ().motor;
-			jm.targetVelocity = curr.getSpeed();
-			nodes [curr.getNode ()].transform.GetComponent<HingeJoint> ().motor = jm;
+			if(nodes.Count < curr.getNode()){
+				JointMotor jm = nodes [curr.getNode ()].transform.GetComponent<HingeJoint> ().motor;
+				jm.targetVelocity = curr.getSpeed();
+				nodes [curr.getNode ()].transform.GetComponent<HingeJoint> ().motor = jm;
+			}else{
+				myInstructions.removeInstructionAt(--pc);
+			}
 			pc %= myInstructions.getCount ();
 		}
 	}

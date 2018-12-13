@@ -80,9 +80,11 @@ public class MonsterTree {
 			}
 		}
 
-		//Insert into Caller and add target's nodes to caller's list
-		res.nodes[index].children[insertionPos] = newNodes[0];
-		res.nodes.AddRange(newNodes);
+		if (index < res.nodes.Count && index > 0 && insertionPos< res.nodes[index].children.Length && insertionPos > 0 && newNodes.Count > 0){
+			//Insert into Caller and add target's nodes to caller's list
+			res.nodes[index].children[insertionPos] = newNodes[0];
+			res.nodes.AddRange(newNodes);
+		}
 		return res;
 	}
 	private static int min(int a, int b){
