@@ -13,8 +13,6 @@ public class MonsterTree {
 	private static GameObject eye = Resources.Load<GameObject>("Eye");
 	private static Material monsterMat = Resources.Load<Material>("MonsterBase");
 
-	private static readonly float MUTATION_CHANCE = 0.3f;
-
 	public MonsterTree(){
 		nodes = new List<MonsterTreeNode>();
 	}
@@ -150,7 +148,7 @@ public class MonsterTree {
 	}
 	public MonsterTree Breed(MonsterTree tree, out Dictionary<MonsterTreeNode, int> parent1Map, out Dictionary<MonsterTreeNode, int> parent2Map){
 		float type = UnityEngine.Random.Range(0.0f,1.0f);
-		if(type <= 0.0f /*TODO: CROSSOVER_CHANCE*/){
+		if(type <= Monster.CROSSOVER_CHANCE){
 			//Crossover
 			return crossover(tree, out parent1Map, out parent2Map);
 		}
@@ -186,7 +184,7 @@ public class MonsterTree {
 		* Change scale x, y, and z
 		**/
 		float random = Random.Range(0.0f, 1.0f);
-		if (random <= MUTATION_CHANCE){
+		if (random <= Monster.PER_NODE_MUTATION_CHANCE){
 			random = Random.Range(0.0f, 1.0f);
 			if (random <= 0.1f){
 				//Add a node at 10%

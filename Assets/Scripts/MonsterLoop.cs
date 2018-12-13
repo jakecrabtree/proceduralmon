@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 
 public class MonsterLoop : MonoBehaviour {
 
@@ -14,8 +15,9 @@ public class MonsterLoop : MonoBehaviour {
 
 	private static readonly float FITNESS_WRITEOUT_CUTOFF = 200; //TODO: Change me
 
-	private static readonly float FITNESS_EVALUATION_TIME = 3; // Seconds TODO: Change me
+	public static readonly float FITNESS_EVALUATION_TIME = 5; // Seconds TODO: Change me
 
+	public static readonly float FITNESS_EVALUATION_TIME_SCALE = 1.5f;
 
 
 	private List<Monster> generation;
@@ -32,6 +34,8 @@ public class MonsterLoop : MonoBehaviour {
 		}
 		DontDestroyOnLoad(gameObject);
 		InitializeGeneration();
+		Time.timeScale = FITNESS_EVALUATION_TIME_SCALE;
+		StartCoroutine(RunGeneration());
 	}
 
 	void InitializeGeneration(){
@@ -42,9 +46,12 @@ public class MonsterLoop : MonoBehaviour {
 		currentMonster = 0;
 	}
 
-	void RunGeneration(){
+	IEnumerator RunGeneration(){
 		for (; currentMonster < generation.Count; ++currentMonster){
-			RunEvaluation(generation[currentMonster]);
+			Scene scene = SceneManager.GetActiveScene(); 
+			SceneManager.LoadScene(scene.name);
+			generation[currentMonster].GenerateMonster();
+			yield return new WaitForSeconds(FITNESS_EVALUATION_TIME);
 			float fitness = generation[currentMonster].fitness;
 			if (fitness >= FITNESS_REPRODUCTION_CUTOFF){
 				reproduce.Add(generation[currentMonster]);
@@ -56,6 +63,7 @@ public class MonsterLoop : MonoBehaviour {
 		Reproduce();
 		MutateNewGeneration();
 		currentMonster = 0;
+		StartCoroutine(RunGeneration());
 	}
 
 	void Reproduce(){
@@ -81,13 +89,6 @@ public class MonsterLoop : MonoBehaviour {
 		foreach(Monster monster in generation){
 			monster.Mutate();
 		}
-	}
-
-	void RunEvaluation(Monster monster){
-		//Load empty eval scene
-		monster.GenerateMonster();
-		//Let it go until time cutoff
-		//Evaluate
 	}
 
 	// Use this for initialization
