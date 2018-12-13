@@ -52,14 +52,14 @@ public class Creature : MonoBehaviour {
 		}
 		if (isSetup && shouldWalk && (semitick++ & 15) == 0 && myInstructions.getCount() > 0) {
 			Instruction curr = myInstructions.getInstruction (pc++);
-			if(nodes.Count < curr.getNode()){
+			if(curr.getNode() < nodes.Count){
 				JointMotor jm = nodes [curr.getNode ()].transform.GetComponent<HingeJoint> ().motor;
 				jm.targetVelocity = curr.getSpeed();
 				nodes [curr.getNode ()].transform.GetComponent<HingeJoint> ().motor = jm;
+				pc %= myInstructions.getCount ();
 			}else{
 				myInstructions.removeInstructionAt(--pc);
 			}
-			pc %= myInstructions.getCount ();
 		}
 	}
 
