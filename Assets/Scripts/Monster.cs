@@ -124,8 +124,73 @@ public class Monster {
 		tree.generateMonster();
 	}
 
-	public void WriteToFile(){
+	public void WriteBytes(byte[] bytes, List<byte> toOut) {
+		for (int i = 0; i < bytes.Length; i++) {
+			toOut.Add (bytes [i]);
+		}
+	}
 
+	public void GetName(byte[] bytes, ref ulong name1, ref ulong name2) {
+		for (int i = 0; i < 53; i++) {
+			int sh = i % 16;
+			ulong rel = bytes [i * bytes.Length / 53];
+			name1 ^= (rel << (sh * 4));
+		}
+		for (int i = 0; i < 97; i++) {
+			int sh = i % 16;
+			ulong rel = bytes [i * bytes.Length / 97];
+			name2 ^= (rel << (sh * 4));
+		}
+	}
+
+	public string WriteToFile(){
+		ulong name1 = 0;
+		ulong name2 = 0;
+		List<byte> toOut = new List<byte> ();
+		WriteBytes (System.BitConverter.GetBytes(fitness), toOut);
+		WriteBytes (System.BitConverter.GetBytes (set.getCount ()), toOut);
+		for (int i = 0; i < set.getCount (); i++) {
+			Instruction ins = set.getInstruction (i);
+			WriteBytes (System.BitConverter.GetBytes (ins.getNode()), toOut);
+			WriteBytes (System.BitConverter.GetBytes (ins.getSpeed()), toOut); 
+		}
+		WriteBytes (System.BitConverter.GetBytes (tree.nodes.Count), toOut);
+		for (int i = 0; i < tree.nodes.Count; i++) {
+			MonsterTreeNode mtn = tree.nodes [i];
+			WriteBytes (System.BitConverter.GetBytes(mtn.parent), toOut);
+			WriteBytes (System.BitConverter.GetBytes (mtn.scale.x), toOut);
+			WriteBytes (System.BitConverter.GetBytes (mtn.scale.y), toOut);
+			WriteBytes (System.BitConverter.GetBytes (mtn.scale.z), toOut);
+			for (int j = 0; j < 20; j++) {
+				MonsterTreeNode link = mtn.children [j];
+				Debug.Log ("Looking at: " + j);
+				bool isFound = false;
+				if (link == null) {
+					WriteBytes (System.BitConverter.GetBytes (-1), toOut);
+				} else {
+					Debug.Log ("NOT NULL");
+					for (int k = 0; k < tree.nodes.Count; k++) {
+						if (link == tree.nodes [k]) {
+							isFound = true;
+							WriteBytes (System.BitConverter.GetBytes (k), toOut);
+							break;
+						}
+					}
+					if (!isFound) {
+						Debug.Log ("DID NOT FIND!!!");
+					}
+				}
+			}
+		}
+		byte[] bytes = new byte[toOut.Count];
+		for (int i = 0; i < toOut.Count; i++) {
+			bytes [i] = toOut [i];
+		}
+		GetName (bytes, ref name1, ref name2);
+		string name = "Monsters/" + name1 + "-" + name2 + ".mon";
+		System.IO.FileStream f = new System.IO.FileStream (name, System.IO.FileMode.CreateNew, System.IO.FileAccess.Write);
+		f.Write (bytes, 0, bytes.Length);
+		return name;
 	}
 
 	public void ReadFromFile(){

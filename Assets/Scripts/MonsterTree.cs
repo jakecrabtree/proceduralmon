@@ -302,7 +302,10 @@ public abstract class MonsterTreeNode {
 	}
 
 	public abstract Vector3 randomScale();
-	
+
+	private void getNodesList() {
+
+	}
 
 	private MonsterTreeNode CopySubTreeHelper(List<MonsterTreeNode> nodes, MonsterTreeNode parentNode){
 		MonsterTreeNode copyNode = this.LocalClone();
