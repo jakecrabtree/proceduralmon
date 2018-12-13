@@ -108,7 +108,6 @@ public class MonsterTree {
 					currNode.children[c] = parent1.nodes[childPos];
 				}
 				else{
-					//TODO: Change to random index if cycles can work
 					currNode.children[c] = null;
 				}
 			}
@@ -124,7 +123,6 @@ public class MonsterTree {
 					currNode.children[c] = parent1.nodes[childPos];
 				}
 				else{
-					//TODO: Change to random index if cycles can work
 					currNode.children[c] = null;
 				}
 			}

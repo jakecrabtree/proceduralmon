@@ -63,7 +63,8 @@ public class Monster {
 		float rand = Random.Range(0.0f, 1.0f);
 		if (rand <= ASEXUAL_CHANCE){
 			MonsterTree childTree = this.tree.Breed(other.tree);
-			InstructionSet childSet = new InstructionSet(childTree.NodeCount()); //TODO: replace with set.Breed(other.set);
+			//TODO: remap vertices
+			InstructionSet childSet = this.set.Breed(other.set);
 			return new Monster(childTree, childSet);
 		}else{
 			return Asexual();
@@ -72,7 +73,7 @@ public class Monster {
 
 	public Monster Asexual(){
 		MonsterTree childTree = this.tree.Asexual();
-		InstructionSet childSet = new InstructionSet(childTree.NodeCount()); //TODO: replace with set.Asexual();
+		InstructionSet childSet = this.set.Asexual();
 		return new Monster(childTree, childSet);	
 	}
 

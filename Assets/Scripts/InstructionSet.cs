@@ -12,6 +12,10 @@ public class InstructionSet {
     public InstructionSet() {
         instructionSet = new List<Instruction>();
     }
+
+    public InstructionSet(List<Instruction> instructions){
+        this.instructionSet = instructions;
+    }
     
     public InstructionSet(int numNodes) { //a constructor that creates a set of random instructions for numNodes
 		instructionSet = new List<Instruction>();
@@ -39,31 +43,60 @@ public class InstructionSet {
     public int getCount(){
         return instructionSet.Count;
     }
-    
-    public List<Instruction> instructionSetGraft(int node, InstructionSet list) {
+
+    public InstructionSet Asexual(){
         List<Instruction> newInstructionSet = new List<Instruction>();
         for (int i = 0; i < instructionSet.Count; i++) {
-            newInstructionSet.Add(instructionSet[i]);
+            newInstructionSet.Add(instructionSet[i].copy());
         }
-        for (int i = 0; i < list.instructionSet.Count; i++){
-            Instruction inst = list.instructionSet[i];
-			if(inst.getNode() == node) {
-                newInstructionSet.Add(inst);
-            }
+        return new InstructionSet(newInstructionSet);
+    }
+
+    public InstructionSet Breed(InstructionSet other){
+        float type = UnityEngine.Random.Range(0.0f,1.0f);
+		if(type <= Monster.CROSSOVER_CHANCE){
+			//Crossover
+			return Crossover(other);
 		}
-        return newInstructionSet;
+		else{
+			//Grafting
+			return Graft(other);
+		}
+    }
+
+    private InstructionSet Graft(InstructionSet other) {
+        List<Instruction> newInstructionSet = new List<Instruction>();
+        for (int i = 0; i < instructionSet.Count; i++) {
+            newInstructionSet.Add(instructionSet[i].copy());
+        }
+        int pos = Random.Range(0, other.instructionSet.Count);
+        List<Instruction> children = new List<Instruction>();
+        for (int i = pos; i < other.instructionSet.Count; ++i){
+            children.Add(other.instructionSet[i].copy());
+        }
+        int insertionPos = (pos > newInstructionSet.Count) ? newInstructionSet.Count : pos;
+        newInstructionSet.InsertRange(insertionPos, children);
+        return new InstructionSet(newInstructionSet);
     }
     
-    public List<Instruction> instructionSetCrossover(InstructionSet other, int crossoverPoint) { //passed in
+    private InstructionSet Crossover(InstructionSet other){
+        return Crossover(other, Random.Range(0, instructionSet.Count));
+    } 
+
+    private InstructionSet Crossover(InstructionSet other, int crossoverPoint) { //passed in
         List<Instruction> newInstructionSet = new List<Instruction>();
         for (int i = 0; i < instructionSet.Count; i++) {
-            newInstructionSet.Add(instructionSet[i]);
+            newInstructionSet.Add(instructionSet[i].copy());
+        }
+        List<Instruction> otherInstructionSet = new List<Instruction>();
+        for (int i = 0; i < other.instructionSet.Count; i++) {
+            otherInstructionSet.Add(other.instructionSet[i].copy());
         }
         newInstructionSet.RemoveRange(crossoverPoint, instructionSet.Count - crossoverPoint);
-        int min = crossoverPoint < instructionSet.Count ? crossoverPoint : instructionSet.Count;
-		other.instructionSet.RemoveRange(0, min);
-		newInstructionSet.AddRange(other.instructionSet);
-        return newInstructionSet;
+        int min = crossoverPoint < otherInstructionSet.Count ? crossoverPoint : otherInstructionSet.Count;
+		otherInstructionSet.RemoveRange(0, min);
+		newInstructionSet.AddRange(otherInstructionSet);
+        return new InstructionSet(newInstructionSet);
     }
     
     public void removeNode(int node) {
