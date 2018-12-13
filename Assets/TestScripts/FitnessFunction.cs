@@ -7,12 +7,13 @@ using System.IO;
 
 public class FitnessFunction : MonoBehaviour {
     //public Transform creature;
+    Monster monster;
     public Rigidbody rb;
     public float time;
     public float distanceTravelled;
     public float endDistance = 0;
     public float weightedVelocityScore = 0;
-    private static readonly float TIME_STEP = 0.1f;    
+    private static readonly float TIME_STEP = 0.2f;    
 
     Vector3 oldPos, newPos, startPos;
 
@@ -20,6 +21,7 @@ public class FitnessFunction : MonoBehaviour {
 	void Start () {
         rb = GetComponent<Rigidbody>();
         time = 0;
+        StartCoroutine(ScoreVelocity());
         //
 	}
 	
@@ -31,6 +33,9 @@ public class FitnessFunction : MonoBehaviour {
         }
 	}
 
+    public void AssignMonster(Monster monster){
+        this.monster = monster;
+    }
  
     IEnumerator ScoreVelocity()
     {
@@ -44,7 +49,7 @@ public class FitnessFunction : MonoBehaviour {
         }
         endDistance = Vector3.Distance(startPos, centerOfMass());
         float fitness = (weightedVelocityScore * MonsterLoop.FITNESS_EVALUATION_TIME + endDistance) / 2;
-
+        monster.fitness = fitness;
     }
 
 

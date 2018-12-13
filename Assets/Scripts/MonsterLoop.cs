@@ -6,7 +6,7 @@ using UnityEngine.SceneManagement;
 public class MonsterLoop : MonoBehaviour {
 
 	public static MonsterLoop instance = null;
-	private static readonly int GENERATION_SIZE = 1000; //TODO: Change me
+	private static readonly int GENERATION_SIZE = 500; 
 	private static readonly int INITIAL_MONSTER_TREE_DEPTH = 3;
 
 	private static readonly int MIN_REPRODUCTION_POOL_SIZE = 2;
@@ -15,7 +15,7 @@ public class MonsterLoop : MonoBehaviour {
 
 	private static readonly float FITNESS_WRITEOUT_CUTOFF = 200; //TODO: Change me
 
-	public static readonly float FITNESS_EVALUATION_TIME = 5; // Seconds TODO: Change me
+	public static readonly float FITNESS_EVALUATION_TIME = 3; // Seconds TODO: Change me
 
 	public static readonly float FITNESS_EVALUATION_TIME_SCALE = 1.5f;
 
@@ -57,7 +57,7 @@ public class MonsterLoop : MonoBehaviour {
 				reproduce.Add(generation[currentMonster]);
 			}
 			if (fitness >= FITNESS_WRITEOUT_CUTOFF){
-				//TODO: monster write
+				generation[currentMonster].WriteToFile();
 			}
 		}
 		Reproduce();
