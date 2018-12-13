@@ -59,6 +59,9 @@ public class Creature : MonoBehaviour {
 				pc %= myInstructions.getCount ();
 			}else{
 				myInstructions.removeInstructionAt(--pc);
+				if (myInstructions.getCount() != 0){
+					pc %= myInstructions.getCount ();
+				}
 			}
 		}
 	}
