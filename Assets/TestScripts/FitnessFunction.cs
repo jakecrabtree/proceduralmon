@@ -8,42 +8,44 @@ using System.IO;
 public class FitnessFunction : MonoBehaviour {
     //public Transform creature;
     public Rigidbody rb;
-    public float timeScale = 1;
-    public float period = 10;
-    public float timeLeft;
+    public float time;
     public float distanceTravelled;
-    public float maxDistance = 0;
-    public float endVel = 0;
+    public float endDistance = 0;
+    public float weightedVelocityScore = 0;
+    private static readonly float TIME_STEP = 0.1f;    
+
+    Vector3 oldPos, newPos, startPos;
 
 	// Use this for initialization
 	void Start () {
         rb = GetComponent<Rigidbody>();
-        Time.timeScale = timeScale;
-        timeLeft = period;
+        time = 0;
+        //
 	}
 	
 	// Update is called once per frame
 	void Update () {
-        timeLeft -= Time.deltaTime;
-        if(timeLeft <= 0) {
+        time += Time.deltaTime;
+        if(time >= MonsterLoop.FITNESS_EVALUATION_TIME) {
             //end simulation, compare to other creatures
         }
 	}
 
-    void FixedUpdate ()
+ 
+    IEnumerator ScoreVelocity()
     {
-        distanceTravelled = Vector3.Distance(new Vector3(0, 0, 0), transform.position);
-        if(distanceTravelled > maxDistance)
+        startPos = centerOfMass();
+        while (time < MonsterLoop.FITNESS_EVALUATION_TIME)
         {
-            maxDistance = distanceTravelled;
+            oldPos = centerOfMass();
+            yield return new WaitForSeconds(TIME_STEP);
+            newPos = centerOfMass();
+            weightedVelocityScore += calculateVelocity(oldPos, newPos, TIME_STEP).magnitude * VelocityWeight();
         }
+        endDistance = Vector3.Distance(startPos, centerOfMass());
+        float fitness = (weightedVelocityScore * MonsterLoop.FITNESS_EVALUATION_TIME + endDistance) / 2;
 
-        if(timeLeft <= period * 0.20f)
-        {
-            endVel = rb.velocity.magnitude;
-        }
     }
-
 
 
     // Weight's the creature's value based on it's max distance from origin (measured from center of mass) and average end velocity (measured by last 20% of the period)
@@ -52,19 +54,28 @@ public class FitnessFunction : MonoBehaviour {
         return 0;
     }
 
-    /*
-    void Save()
-    {
-        //BinaryFormatter bf = new BinaryFormatter();
-        FileStream file = File.Open(Application.persistentDataPath + "/creatureData.dat", FileMode.Open);
+    // Multiply later veloiescit by the time to get the weighted, add to total distance then divide by 2
 
-        CreatureData data = new CreatureData();
+
+    Vector3 centerOfMass()
+    {
+        List<GameObject> nodes = GetComponent<Creature>().getNodes();
+        Vector3 centerOfMassSum = new Vector3();
+        foreach (GameObject gO in nodes)
+        {
+            centerOfMassSum += gO.GetComponent<Rigidbody>().centerOfMass;
+        }
+        centerOfMassSum.y = 0;
+        return centerOfMassSum / nodes.Count;
     }
 
-    class CreatureData
+    float VelocityWeight()
     {
-        public float distanceTravelled;
-        public MonsterTree monsterTree;
+        return time / MonsterLoop.FITNESS_EVALUATION_TIME;
     }
-    */
+
+    Vector3 calculateVelocity(Vector3 oldPos, Vector3 newPos, float deltaTime)
+    {
+        return (newPos - oldPos) / deltaTime;
+    }
 }

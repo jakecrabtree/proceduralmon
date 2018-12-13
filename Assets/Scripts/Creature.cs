@@ -43,4 +43,9 @@ public class Creature : MonoBehaviour {
 			pc %= myInstructions.getCount ();
 		}
 	}
+
+    public List<GameObject> getNodes()
+    {
+        return nodes;
+    }
 }
